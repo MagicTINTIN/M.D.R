@@ -22,7 +22,7 @@ for arg in "$@"; do
 done
 
 cd $folder/
-cmake $cmakearg ..
+cmake $cmakearg ../
 if [[ $? != 0 ]]; then
     err=$?
     echo -ne "$(tput setaf 9)"
