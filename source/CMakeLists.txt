@@ -5,7 +5,8 @@ include_directories(
     ${GTKMM_INCLUDE_DIRS}  )
 
 add_executable(mdr
-    main.cc )
+    main.cc
+    helloworld.cc )
 
 target_link_libraries(mdr 
     ${GTKMM_LIBRARIES}  )
