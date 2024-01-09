@@ -1,13 +1,13 @@
-#include "examplewindow.h"
+#include "helloworld.h"
 #include <gtkmm/main.h>
 
-int main(int argc, char *argv[])
+int main (int argc, char *argv[])
 {
   Gtk::Main kit(argc, argv);
 
-  ExampleWindow window;
+  HelloWorld helloworld;
   //Shows the window and returns when it is closed.
-  Gtk::Main::run(window);
+  Gtk::Main::run(helloworld);
 
   return 0;
 }

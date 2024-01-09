@@ -6,7 +6,8 @@ include_directories(
 
 add_executable(mdr
     main.cc
-    helloworld.cc )
+    examplewindow.cc
+    labeledoptionmenu.cc )
 
 target_link_libraries(mdr 
     ${GTKMM_LIBRARIES}  )
