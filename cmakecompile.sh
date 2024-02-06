@@ -12,6 +12,7 @@ for arg in "$@"; do
         cmakearg+=" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=\"-O3\" "
     elif [ "$arg" = "--debug" ]; then
         cmakearg+=" -DCMAKE_BUILD_TYPE=Debug "
+        makearg+=" VERBOSE=1 "
         folder="debug"
     elif [ "$arg" = "--fastcomile" ]; then
         makearg+=" -j4 "
