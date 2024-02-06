@@ -9,3 +9,16 @@ Software reroute sounds from applications to mixing table.
 Requirements:
 - portmidi
 - gtkmm (2.4/2.24)
+
+```
+Idées de features:
+
+Faders:
+- Applications audio level (with invidiual mutes, select button focuses the app) : app names are displayed in the lcds
+- Global audio level
+...
+- Screen brightness
+
+Level indicators:
+- Display CPU/RAM/Disk/Network usage
+```
