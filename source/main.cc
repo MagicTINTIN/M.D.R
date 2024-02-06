@@ -1,13 +1,53 @@
-#include "examplewindow.h"
-#include <gtkmm/main.h>
+#include <iostream>
+#include "portmidi.h"
 
-int main(int argc, char *argv[])
+PmError initializePortMidi()
 {
-  Gtk::Main kit(argc, argv);
+    PmError error = Pm_Initialize();
+    if (error != pmNoError)
+    {
+        std::cerr << "Error initializing PortMidi: " << Pm_GetErrorText(error) << std::endl;
+    }
+    return error;
+}
 
-  ExampleWindow window;
-  //Shows the window and returns when it is closed.
-  Gtk::Main::run(window);
+void displayDeviceInfo(PmDeviceInfo d) {
+    std::cout << d.name << " > I/O: " << d.input << "/" << d.output << " | opened: " << d.opened << " virtual:" << d.is_virtual; 
+}
 
-  return 0;
+void getAllDeviceInfo() {
+    int devicesCount = Pm_CountDevices();
+    std::cout << "Total number of devices: " << devicesCount << std::endl
+    << "Default device: " << Pm_GetDefaultInputDeviceID() << std::endl;
+    for (PmDeviceID i = 0; i < devicesCount; i++)
+    {
+        PmDeviceInfo device = *Pm_GetDeviceInfo(i);
+        std::cout << "- ";
+        displayDeviceInfo(device);
+        std::cout << std::endl;
+    }
+    
+}
+
+void terminatePortMidi()
+{
+    Pm_Terminate();
+}
+
+int main()
+{
+    std::cout << "Starting mdr\n";
+    
+    if (initializePortMidi() != pmNoError)
+    {
+        return 1;
+    }
+
+    getAllDeviceInfo();
+
+    // Terminate PortMidi
+    terminatePortMidi();
+
+    std::cout << "Ending mdr\n";
+    return 0;
 }

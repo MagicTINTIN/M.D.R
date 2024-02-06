@@ -1,1 +1,10 @@
-{}
+{
+    "files.associations": {
+        "h_hostfile": "plaintext",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "bitset": "cpp",
+        "algorithm": "cpp",
+        "format": "cpp"
+    }
+}
