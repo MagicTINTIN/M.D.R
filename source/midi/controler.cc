@@ -4,6 +4,7 @@
 #include "portmidi.h"
 #include "controler.hh"
 #include "communication.hh"
+#include "xtouch.hh"
 
 bool findController(PmDeviceID &in, PmDeviceID &out, std::string const &name)
 {
@@ -43,7 +44,7 @@ void openAndSendMidiMessage(PmDeviceID &deviceOut)
 
     // MIDI message to light up the second button
     PmEvent midiEvent;
-    midiEvent.message = Pm_Message(0x90, 0x01, 0x7F); // MIDI Note On, channel 1, note number 1, velocity 127
+    midiEvent.message = Pm_Message(0x90, 0x00, 1); // MIDI Note On, channel 1, note number 1, velocity 127
     midiEvent.timestamp = 0;                          // send immediately
 
     // send the MIDI message
@@ -51,4 +52,29 @@ void openAndSendMidiMessage(PmDeviceID &deviceOut)
 
     // close the MIDI output device
     Pm_Close(midiStream);
+}
+
+Controler::Controler(std::string name, PmDeviceID in, PmDeviceID out) : _name(name), _deviceIn(in), _deviceOut(out) {
+    PmError errorIn = Pm_OpenInput(&_midiInStream, _deviceIn, nullptr, 1, nullptr, nullptr);
+    PmError errorOut = Pm_OpenOutput(&_midiOutStream, _deviceOut, nullptr, 1, nullptr, nullptr, 0);
+    if (errorIn != pmNoError)
+    {
+        std::cerr << "Error opening " << _name << " MIDI input: " << Pm_GetErrorText(errorIn) << std::endl;
+    }
+    if (errorOut != pmNoError)
+    {
+        std::cerr << "Error opening " << _name << " MIDI output: " << Pm_GetErrorText(errorOut) << std::endl;
+    }
+}
+
+Controler::~Controler() {
+    Pm_Close(_midiInStream);
+    Pm_Close(_midiOutStream);
+}
+
+void Controler::setLight(int const &button, int const &value) {
+    PmEvent midiEvent;
+    midiEvent.message = Pm_Message(0x90, button, value);
+    midiEvent.timestamp = 0;
+    Pm_Write(_midiOutStream, &midiEvent, 1);
 }
