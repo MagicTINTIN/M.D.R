@@ -6,7 +6,9 @@ include_directories(
 
 
 add_executable(mdr
-    main.cc )
+    main.cc
+    midi/communication.cc
+    midi/controler.cc )
 
 #    examplewindow.cc
 #    labeledoptionmenu.cc
