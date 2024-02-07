@@ -13,7 +13,12 @@ add_executable(mdr
 
 target_link_libraries(mdr 
     ${GTKMM_LIBRARIES} ${PORTMIDI_LIBRARIES} )
-# target_link_libraries(mdr 
-#     ${PORTMIDI_LIBRARIES} )
-
+    
 target_include_directories(mdr PRIVATE ${PORTMIDI_INCLUDE_DIRS})
+
+set_target_properties( mdr
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)

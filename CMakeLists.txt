@@ -9,4 +9,4 @@ find_package(PortMidi REQUIRED)
 pkg_check_modules(GTKMM gtkmm-2.4)
 pkg_check_modules(PORTMIDI portmidi)
 
-add_subdirectory(source) 
+add_subdirectory(source)

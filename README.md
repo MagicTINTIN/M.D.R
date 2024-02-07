@@ -3,22 +3,29 @@
 ---
 Software reroute sounds from applications to mixing table.
 
-/!\ project is still in developpement, so it might not work /!\
-- Plan to support Behringer XR 18
+> ⚠️ project is still in developpement, so it might not work ⚠️
 
-Requirements:
+---
+# Requirements:
+## Hardware
+Having a X-Touch
+## Software (dependencies)
 - portmidi
 - gtkmm (2.4/2.24)
+- cmake
 
-```
-Idées de features:
-
-Faders:
+---
+# (Maybe) future features:
+## X-Touch Display/Control
+### Faders:
 - Applications audio level (with invidiual mutes, select button focuses the app) : app names are displayed in the lcds
-- Global audio level
+- Global audio level\
 ...
 - Screen brightness
 
-Level indicators:
+### Sound level indicators:
 - Display CPU/RAM/Disk/Network usage
+
+## Other
+- Plan to support Behringer XR 18 controls and I/O sound
 ```
