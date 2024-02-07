@@ -38,9 +38,8 @@ if [[ $? != 0 ]]; then
     echo "Compilation of $projectName went wrong.$(tput sgr0)"
     cd ../
     exit $err
-elif [[ $? == 0 ]]; then
-    echo "$(tput setaf 2)$(tput bold)Compilation of $projectName finished.$(tput sgr0)
-    Execute Brainfuck++ compiler with build/$projectName"
+else
+    echo -e "$(tput setaf 2)$(tput bold)Compilation of $projectName finished.$(tput sgr0)\nExecute the compiled program using ./exec.sh [args...]"
 fi
 
 cd ../
