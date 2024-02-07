@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef GTKMM_EXAMPLE_RANGEWIDGETS_H
 #define GTKMM_EXAMPLE_RANGEWIDGETS_H
 

@@ -2,8 +2,8 @@
 #include <cstring>
 #include <string>
 #include "portmidi.h"
-#include "internal/communication.hh"
-#include "internal/controler.hh"
+#include "midi/communication.hh"
+#include "midi/controler.hh"
 
 int main()
 {
