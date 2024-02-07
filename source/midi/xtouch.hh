@@ -8,6 +8,9 @@ const int XTOUCH_STATUS_OFF = 0;
 const int XTOUCH_STATUS_BLINK = 1;
 const int XTOUCH_STATUS_ON = 127;
 
+// Buttons
+const int XTOUCH_NB_OF_BUTTONS = 102;
+
 // channels buttons
 const int XTOUCH_REC1 = 0;
 const int XTOUCH_REC2 = 1;

@@ -8,7 +8,8 @@ include_directories(
 add_executable(mdr
     main.cc
     midi/communication.cc
-    midi/controler.cc )
+    midi/controler.cc
+    midi/animations.cc )
 
 #    examplewindow.cc
 #    labeledoptionmenu.cc

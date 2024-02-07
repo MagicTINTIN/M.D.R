@@ -26,9 +26,11 @@ int main()
     }
     Controler surface(surfaceName, dInputId, dOutputId);
 
-    surface.setLight(XTOUCH_CYCLE, XTOUCH_STATUS_BLINK);
-    surface.setLight(XTOUCH_SOLO, XTOUCH_STATUS_ON);
-    surface.setLight(XTOUCH_REC2, XTOUCH_STATUS_OFF);
+    surface.setAllLights(XTOUCH_STATUS_OFF);
+    surface.anim_chaser(10);
+    surface.anim_colors(250);
+    surface.anim_rows(50);
+    surface.anim_columns(50);
 
     terminatePortMidi();
     std::cout << "Ending mdr\n";

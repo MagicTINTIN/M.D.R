@@ -30,30 +30,6 @@ bool findController(PmDeviceID &in, PmDeviceID &out, std::string const &name)
     return found % 6 == 0;
 }
 
-void openAndSendMidiMessage(PmDeviceID &deviceOut)
-{
-    // open the midi output device
-    PmStream *midiStream;
-    PmError error = Pm_OpenOutput(&midiStream, deviceOut, nullptr, 1, nullptr, nullptr, 0);
-
-    if (error != pmNoError)
-    {
-        std::cerr << "Error opening MIDI output: " << Pm_GetErrorText(error) << std::endl;
-        return;
-    }
-
-    // MIDI message to light up the second button
-    PmEvent midiEvent;
-    midiEvent.message = Pm_Message(0x90, 0x00, 1); // MIDI Note On, channel 1, note number 1, velocity 127
-    midiEvent.timestamp = 0;                          // send immediately
-
-    // send the MIDI message
-    Pm_Write(midiStream, &midiEvent, 1);
-
-    // close the MIDI output device
-    Pm_Close(midiStream);
-}
-
 Controler::Controler(std::string name, PmDeviceID in, PmDeviceID out) : _name(name), _deviceIn(in), _deviceOut(out) {
     PmError errorIn = Pm_OpenInput(&_midiInStream, _deviceIn, nullptr, 1, nullptr, nullptr);
     PmError errorOut = Pm_OpenOutput(&_midiOutStream, _deviceOut, nullptr, 1, nullptr, nullptr, 0);
@@ -77,4 +53,36 @@ void Controler::setLight(int const &button, int const &value) {
     midiEvent.message = Pm_Message(0x90, button, value);
     midiEvent.timestamp = 0;
     Pm_Write(_midiOutStream, &midiEvent, 1);
+}
+
+void Controler::setAllLights(int const &status) {
+    for (size_t i = 0; i < XTOUCH_NB_OF_BUTTONS; i++)
+    {
+        setLight(i, status);
+    }
+}
+
+void Controler::allLightsRed(int const &status) {
+    for (int i : XTOUCH_RED)
+    {
+        setLight(i, status);
+    }
+}
+void Controler::allLightsBlue(int const &status) {
+    for (int i : XTOUCH_BLUE)
+    {
+        setLight(i, status);
+    }
+}
+void Controler::allLightsGreen(int const &status) {
+    for (int i : XTOUCH_GREEN)
+    {
+        setLight(i, status);
+    }
+}
+void Controler::allLightsYellow(int const &status) {
+    for (int i : XTOUCH_YELLOW)
+    {
+        setLight(i, status);
+    }
 }
