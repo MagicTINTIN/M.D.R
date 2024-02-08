@@ -4,10 +4,38 @@
 #include <algorithm>
 #include <iomanip>
 #include <unistd.h>
+#include <random>
 #include "portmidi.h"
 #include "controler.hh"
 #include "communication.hh"
 #include "xtouch.hh"
+
+void Controler::animRandom(int const &steps, int const &stepTime, bool const &blinking)
+{
+    int type(0), btn(0);
+    if (blinking)
+        for (size_t i = 0; i < steps || steps < 0; i++)
+        {
+            type = std::rand() % 4;
+            if (type == 2)
+                type = XTOUCH_STATUS_OFF;
+            else if (type == 3)
+                type = XTOUCH_STATUS_ON;
+            btn = std::rand() % XTOUCH_NB_OF_BUTTONS;
+            setLight(btn, type);
+            usleep(1000 * stepTime);
+        }
+    else
+        for (size_t i = 0; i < steps || steps < 0; i++)
+        {
+            type = std::rand() % 2;
+            if (type > 0)
+                type = XTOUCH_STATUS_ON;
+            btn = std::rand() % XTOUCH_NB_OF_BUTTONS;
+            setLight(btn, type);
+            usleep(1000 * stepTime);
+        }
+}
 
 void Controler::animChaser(int const &stepTime, bool const &reverse)
 {
@@ -185,7 +213,8 @@ void Controler::animUpperLeftCross(int const &stepTime, bool const &reverse)
 
 void Controler::animFilledUpperLeftCross(int const &stepTime, bool const &reverse)
 {
-    if (reverse) {
+    if (reverse)
+    {
         for (signed int i = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size()) - 1; i >= 0; i--)
         {
             if (i < XTOUCH_ROWS.size())
@@ -203,7 +232,8 @@ void Controler::animFilledUpperLeftCross(int const &stepTime, bool const &revers
             usleep(1000 * stepTime);
         }
     }
-    else {
+    else
+    {
         for (size_t i = 0; i < std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size()); i++)
         {
             if (i < XTOUCH_ROWS.size())
@@ -257,7 +287,8 @@ void Controler::animUpperRightCross(int const &stepTime, bool const &reverse)
 void Controler::animFilledUpperRightCross(int const &stepTime, bool const &reverse)
 {
     const int MAX_ROWS_COLS = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size());
-    if (reverse) {
+    if (reverse)
+    {
         for (signed int i = MAX_ROWS_COLS - 1; i >= 0; i--)
         {
             if (i < XTOUCH_ROWS.size())
@@ -275,7 +306,8 @@ void Controler::animFilledUpperRightCross(int const &stepTime, bool const &rever
             usleep(1000 * stepTime);
         }
     }
-    else {
+    else
+    {
         for (size_t i = 0; i < std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size()); i++)
         {
             if (i < XTOUCH_ROWS.size())

@@ -30,6 +30,8 @@ int main()
     surface.setAllLights(XTOUCH_STATUS_OFF);
     surface.animChaser(20);
     surface.animFilledChaser(5, true);
+    surface.animRandom(10, 30, true);
+    surface.setAllLights(XTOUCH_STATUS_OFF);
     surface.animColors(200);
     surface.setAllLights(XTOUCH_STATUS_ON);
     usleep(400000);
@@ -58,6 +60,7 @@ int main()
     surface.animFilledUpperRightCross(30, true);
     surface.animUpperLeftCross(60);
     surface.animFilledRows(30);
+    surface.animRandom(-1, 80, false);
 
     terminatePortMidi();
     std::cout << "Ending mdr\n";

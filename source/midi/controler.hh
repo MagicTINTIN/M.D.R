@@ -22,6 +22,7 @@ public:
     void allLightsYellow(int const &status);
 
     // animations
+    void animRandom(int const &steps, int const &stepTime, bool const &blinking = false);
     void animChaser(int const &stepTime, bool const &reverse = false);
     void animFilledChaser(int const &stepTime, bool const &reverse = false);
     void animColumns(int const &stepTime, bool const &reverse = false);
