@@ -31,12 +31,12 @@ void Controler::animFilledChaser(int const &stepTime, bool const &reverse)
 {
     if (reverse)
     {
-        for (size_t i = XTOUCH_NB_OF_BUTTONS - 1; i >= 0; i--)
+        for (signed int i = XTOUCH_NB_OF_BUTTONS - 1; i >= 0; i--)
         {
             setLight(i, XTOUCH_STATUS_ON);
             usleep(1000 * stepTime);
         }
-        for (size_t i = 0; i < XTOUCH_NB_OF_BUTTONS; i++)
+        for (signed int i = XTOUCH_NB_OF_BUTTONS - 1; i >= 0; i--)
         {
             setLight(i, XTOUCH_STATUS_OFF);
             usleep(1000 * stepTime);
@@ -60,7 +60,7 @@ void Controler::animFilledChaser(int const &stepTime, bool const &reverse)
 void Controler::animColumns(int const &stepTime, bool const &reverse)
 {
     if (reverse)
-        for (size_t i = XTOUCH_COLUMNS.size() - 1; i >= 0; i--)
+        for (signed int i = XTOUCH_COLUMNS.size() - 1; i >= 0; i--)
         {
             setLight(XTOUCH_COLUMNS[i], XTOUCH_STATUS_ON);
             usleep(1000 * stepTime);
@@ -79,12 +79,12 @@ void Controler::animFilledColumns(int const &stepTime, bool const &reverse)
 {
     if (reverse)
     {
-        for (size_t i = XTOUCH_COLUMNS.size() - 1; i >= 0; i--)
+        for (signed int i = XTOUCH_COLUMNS.size() - 1; i >= 0; i--)
         {
             setLight(XTOUCH_COLUMNS[i], XTOUCH_STATUS_ON);
             usleep(1000 * stepTime);
         }
-        for (size_t i = XTOUCH_COLUMNS.size() - 1; i >= 0; i--)
+        for (signed int i = XTOUCH_COLUMNS.size() - 1; i >= 0; i--)
         {
             setLight(XTOUCH_COLUMNS[i], XTOUCH_STATUS_OFF);
             usleep(1000 * stepTime);
@@ -108,7 +108,7 @@ void Controler::animFilledColumns(int const &stepTime, bool const &reverse)
 void Controler::animRows(int const &stepTime, bool const &reverse)
 {
     if (reverse)
-        for (size_t i = XTOUCH_ROWS.size() - 1; i >= 0; i--)
+        for (signed int i = XTOUCH_ROWS.size() - 1; i >= 0; i--)
         {
             setLight(XTOUCH_ROWS[i], XTOUCH_STATUS_ON);
             usleep(1000 * stepTime);
@@ -127,12 +127,12 @@ void Controler::animFilledRows(int const &stepTime, bool const &reverse)
 {
     if (reverse)
     {
-        for (size_t i = XTOUCH_ROWS.size() - 1; i >= 0; i--)
+        for (signed int i = XTOUCH_ROWS.size() - 1; i >= 0; i--)
         {
             setLight(XTOUCH_ROWS[i], XTOUCH_STATUS_ON);
             usleep(1000 * stepTime);
         }
-        for (size_t i = XTOUCH_ROWS.size() - 1; i >= 0; i--)
+        for (signed int i = XTOUCH_ROWS.size() - 1; i >= 0; i--)
         {
             setLight(XTOUCH_ROWS[i], XTOUCH_STATUS_OFF);
             usleep(1000 * stepTime);
@@ -156,7 +156,7 @@ void Controler::animFilledRows(int const &stepTime, bool const &reverse)
 void Controler::animUpperLeftCross(int const &stepTime, bool const &reverse)
 {
     if (reverse)
-        for (size_t i = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size()) - 1; i >= 0; i--)
+        for (signed int i = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size()) - 1; i >= 0; i--)
         {
             if (i < XTOUCH_ROWS.size())
                 setLight(XTOUCH_ROWS[i], XTOUCH_STATUS_ON);
@@ -186,7 +186,7 @@ void Controler::animUpperLeftCross(int const &stepTime, bool const &reverse)
 void Controler::animFilledUpperLeftCross(int const &stepTime, bool const &reverse)
 {
     if (reverse) {
-        for (size_t i = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size()) - 1; i >= 0; i--)
+        for (signed int i = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size()) - 1; i >= 0; i--)
         {
             if (i < XTOUCH_ROWS.size())
                 setLight(XTOUCH_ROWS[i], XTOUCH_STATUS_ON);
@@ -194,7 +194,7 @@ void Controler::animFilledUpperLeftCross(int const &stepTime, bool const &revers
                 setLight(XTOUCH_COLUMNS[i], XTOUCH_STATUS_ON);
             usleep(1000 * stepTime);
         }
-        for (size_t i = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size()) - 1; i >= 0; i--)
+        for (signed int i = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size()) - 1; i >= 0; i--)
         {
             if (i < XTOUCH_ROWS.size())
                 setLight(XTOUCH_ROWS[i], XTOUCH_STATUS_OFF);
@@ -227,7 +227,7 @@ void Controler::animUpperRightCross(int const &stepTime, bool const &reverse)
 {
     const int MAX_ROWS_COLS = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size());
     if (reverse)
-        for (size_t i = MAX_ROWS_COLS - 1; i >= 0; i--)
+        for (signed int i = MAX_ROWS_COLS - 1; i >= 0; i--)
         {
             if (i < XTOUCH_ROWS.size())
                 setLight(XTOUCH_ROWS[i], XTOUCH_STATUS_ON);
@@ -258,7 +258,7 @@ void Controler::animFilledUpperRightCross(int const &stepTime, bool const &rever
 {
     const int MAX_ROWS_COLS = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size());
     if (reverse) {
-        for (size_t i = MAX_ROWS_COLS - 1; i >= 0; i--)
+        for (signed int i = MAX_ROWS_COLS - 1; i >= 0; i--)
         {
             if (i < XTOUCH_ROWS.size())
                 setLight(XTOUCH_ROWS[i], XTOUCH_STATUS_ON);
@@ -266,7 +266,7 @@ void Controler::animFilledUpperRightCross(int const &stepTime, bool const &rever
                 setLight(XTOUCH_COLUMNS[MAX_ROWS_COLS - 1 - i], XTOUCH_STATUS_ON);
             usleep(1000 * stepTime);
         }
-        for (size_t i = MAX_ROWS_COLS - 1; i >= 0; i--)
+        for (signed int i = MAX_ROWS_COLS - 1; i >= 0; i--)
         {
             if (i < XTOUCH_ROWS.size())
                 setLight(XTOUCH_ROWS[i], XTOUCH_STATUS_OFF);

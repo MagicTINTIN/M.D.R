@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstring>
 #include <string>
+#include <vector>
 #include "portmidi.h"
 
 class Controler
