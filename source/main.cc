@@ -27,10 +27,10 @@ int main()
     Controler surface(surfaceName, dInputId, dOutputId);
 
     surface.setAllLights(XTOUCH_STATUS_OFF);
-    surface.anim_chaser(10);
-    surface.anim_colors(250);
-    surface.anim_rows(50);
-    surface.anim_columns(50);
+    surface.animChaser(10);
+    surface.animColors(250);
+    surface.animRows(50);
+    surface.animColumns(50);
 
     terminatePortMidi();
     std::cout << "Ending mdr\n";
