@@ -6,6 +6,7 @@
 #include "midi/communication.hh"
 #include "midi/controler.hh"
 #include "midi/xtouch.hh"
+#include "midi/animations.hh"
 
 int main()
 {
@@ -27,40 +28,7 @@ int main()
     }
     Controler surface(surfaceName, dInputId, dOutputId);
 
-    surface.setAllLights(XTOUCH_STATUS_OFF);
-    surface.animChaser(20);
-    surface.animFilledChaser(5, true);
-    surface.animRandom(10, 30, true);
-    surface.setAllLights(XTOUCH_STATUS_OFF);
-    surface.animColors(200);
-    surface.setAllLights(XTOUCH_STATUS_ON);
-    usleep(400000);
-    surface.setAllLights(XTOUCH_STATUS_OFF);
-    usleep(20000);
-    surface.setAllLights(XTOUCH_STATUS_ON);
-    usleep(100000);
-    surface.setAllLights(XTOUCH_STATUS_OFF);
-    usleep(50000);
-    surface.setAllLights(XTOUCH_STATUS_ON);
-    usleep(25000);
-    surface.setAllLights(XTOUCH_STATUS_OFF);
-    usleep(12500);
-    surface.setAllLights(XTOUCH_STATUS_ON);
-    usleep(12500);
-    surface.setAllLights(XTOUCH_STATUS_OFF);
-    usleep(12500);
-    surface.setAllLights(XTOUCH_STATUS_ON);
-    usleep(12500);
-    surface.setAllLights(XTOUCH_STATUS_OFF);
-    usleep(12500);
-    surface.animRows(50);
-    surface.animColumns(50);
-    surface.animFilledColumns(30, true);
-    surface.animUpperRightCross(60);
-    surface.animFilledUpperRightCross(30, true);
-    surface.animUpperLeftCross(60);
-    surface.animFilledRows(30);
-    surface.animRandom(-1, 80, false);
+    demoLights(surface);
 
     terminatePortMidi();
     std::cout << "Ending mdr\n";
