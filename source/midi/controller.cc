@@ -57,95 +57,59 @@ Controller::~Controller()
 
 // INPUT FUNCTIONS
 
-/*
-void Controller::processMidiInput()
-{
-    PmEvent buffer[BUFFER_SIZE];
-
-    while (true)
-    {
-        int numEvents = Pm_Read(_midiInStream, buffer, BUFFER_SIZE);
-
-        if (numEvents < 0)
-        {
-            std::cerr << "Error (process input) " << Pm_GetErrorText((PmError)numEvents) << std::endl;
-            break;
-        }
-
-        for (int i = 0; i < numEvents; ++i)
-        {
-            PmEvent event = buffer[i];
-
-            int messageType = Pm_MessageStatus(event.message);
-            int channel = Pm_MessageStatus(event.message);
-
-            if (messageType == 0x90)
-            { // Note On
-                int note = Pm_MessageData1(event.message);
-                int velocity = Pm_MessageData2(event.message);
-                std::cout << "Note On - Channel: " << channel << ", Note: " << note << ", Velocity: " << velocity << std::endl;
-            }
-            else if (messageType == 0xB0)
-            { // Control Change
-                int controller = Pm_MessageData1(event.message);
-                int value = Pm_MessageData2(event.message);
-                std::cout << "Control Change - Channel: " << channel << ", Controller: " << controller << ", Value: " << value << std::endl;
-            }
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
-}
-*/
-
 // Process incoming MIDI events
 void Controller::processMidiInput()
 {
-    while (true)
-    {
-        int numEvents = Pm_Read(_midiInStream, midiEvent.events + midiEvent.endIdx, BUFFER_SIZE - midiEvent.endIdx);
-        if (numEvents < 0)
-        {
-            std::cerr << "Error reading MIDI input: " << Pm_GetErrorText((PmError) numEvents) << std::endl;
-            break;
-        }
+    while (true) {
+        PmEvent buffer[BUFFER_SIZE];
 
-        // Update endIdx atomically
-        int newEndIdx = (midiEvent.endIdx + numEvents) % BUFFER_SIZE;
-        midiEvent.endIdx.store(newEndIdx, std::memory_order_relaxed);
-    }
-}
-
-// Function to process MIDI events from the circular buffer
-void Controller::processMidiEvents()
-{
-    while (true)
-    {
-        // Load startIdx and endIdx atomically
-        int startIdx = midiEvent.startIdx.load(std::memory_order_relaxed);
-        int endIdx = midiEvent.endIdx.load(std::memory_order_relaxed);
-
-        if (startIdx != endIdx)
-        {
-            // Process MIDI events in the circular buffer
-            while (startIdx != endIdx)
-            {
-                PmEvent event = midiEvent.events[startIdx];
-                startIdx = (startIdx + 1) % BUFFER_SIZE;
-
-                // Process the MIDI event as needed
-                // (assuming Behringer X Touch MIDI message format)
-
-                int messageType = Pm_MessageStatus(event.message);
-
-                int channel = Pm_MessageStatus(event.message);
-                int controller = Pm_MessageData1(event.message);
-                int value = Pm_MessageData2(event.message);
-                std::cout << "> chn: " << channel << ", btn: " << controller << ", val: " << value << std::endl;
+        int numEvents = Pm_Read(_midiInStream, buffer, BUFFER_SIZE);
+        if (numEvents < 0) {
+            if (numEvents == pmBufferOverflow) {
+                std::cerr << "Buffer overflow occurred. Flushing buffer." << std::endl;
+                // Continue reading from the input
+                continue;
+            } else {
+                std::cerr << "Error (input process) " << Pm_GetErrorText((PmError) numEvents) << std::endl;
+                break;
             }
         }
 
-        // Update startIdx atomically
-        midiEvent.startIdx.store(startIdx, std::memory_order_relaxed);
+        // store events to the circular buffer
+        std::unique_lock<std::mutex> lock(midiEvent.mutex);
+        for (int i = 0; i < numEvents; ++i) {
+            midiEvent.events[midiEvent.endIdx] = buffer[i];
+            midiEvent.endIdx = (midiEvent.endIdx + 1) % AUX_BUFFER_SIZE;
+            if (midiEvent.endIdx == midiEvent.startIdx) {
+                std::cerr << "Circular buffer overflow. Some events may be lost." << std::endl;
+                midiEvent.startIdx = (midiEvent.startIdx + 1) % AUX_BUFFER_SIZE;
+            }
+        }
+        lock.unlock();
+        // notify the event processing thread
+        midiEvent.cv.notify_one();
+    }
+}
+
+// Process MIDI events from the circular buffer
+void Controller::processMidiEvents()
+{
+    while (true) {
+        std::unique_lock<std::mutex> lock(midiEvent.mutex);
+        midiEvent.cv.wait(lock, [&] { return midiEvent.startIdx != midiEvent.endIdx; });
+
+        // Process MIDI events in the circular buffer
+        while (midiEvent.startIdx != midiEvent.endIdx) {
+            PmEvent event = midiEvent.events[midiEvent.startIdx];
+            midiEvent.startIdx = (midiEvent.startIdx + 1) % AUX_BUFFER_SIZE;
+
+            //int messageType = Pm_MessageStatus(event.message);
+            int channel = Pm_MessageStatus(event.message);
+                int controller = Pm_MessageData1(event.message);
+                int value = Pm_MessageData2(event.message);
+                std::cout << "> chn: " << channel << ", btn: " << controller << ", val: " << value << std::endl;
+        }
+        lock.unlock();
     }
 }
 

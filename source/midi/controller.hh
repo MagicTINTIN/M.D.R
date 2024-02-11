@@ -5,17 +5,18 @@
 #include <string>
 #include <vector>
 #include <thread>
-#include <atomic>
 #include <mutex>
 #include <condition_variable>
 #include "portmidi.h"
-#define BUFFER_SIZE 1024
-
+#define BUFFER_SIZE 1024 * 2
+#define AUX_BUFFER_SIZE 1024 * 2
 
 struct MidiEvent {
-    PmEvent events[BUFFER_SIZE];
-    std::atomic<int> startIdx;
-    std::atomic<int> endIdx;
+    PmEvent events[AUX_BUFFER_SIZE];
+    int startIdx;
+    int endIdx;
+    std::mutex mutex;
+    std::condition_variable cv;
 
     MidiEvent() : startIdx(0), endIdx(0) {}
 };
