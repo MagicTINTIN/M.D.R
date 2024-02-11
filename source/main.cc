@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include "portmidi.h"
 #include "midi/communication.hh"
-#include "midi/controler.hh"
+#include "midi/controller.hh"
 #include "midi/xtouch.hh"
 #include "midi/animations.hh"
 
@@ -23,13 +23,13 @@ int main()
 
     if (!findController(dInputId, dOutputId, surfaceName))
     {
-        std::cout << "Could not find X-Touch device among MIDI controlers\n";
+        std::cout << "Could not find X-Touch device among MIDI controllers\n";
         return 2;
     }
-    Controler surface(surfaceName, dInputId, dOutputId);
+    Controller surface(surfaceName, dInputId, dOutputId);
 
     initAnim(surface);
-    surface.processMidiInput();
+    surface.startInputThreads();
 
     terminatePortMidi();
     std::cout << "Ending mdr\n";

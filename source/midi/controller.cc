@@ -3,11 +3,9 @@
 #include <cstring>
 #include <string>
 #include "portmidi.h"
-#include "controler.hh"
+#include "controller.hh"
 #include "communication.hh"
 #include "xtouch.hh"
-
-#define BUFFER_SIZE 1024
 
 bool findController(PmDeviceID &in, PmDeviceID &out, std::string const &name)
 {
@@ -36,7 +34,7 @@ bool findController(PmDeviceID &in, PmDeviceID &out, std::string const &name)
     return found % 6 == 0;
 }
 
-Controler::Controler(std::string name, PmDeviceID in, PmDeviceID out) : _name(name), _deviceIn(in), _deviceOut(out)
+Controller::Controller(std::string name, PmDeviceID in, PmDeviceID out) : _name(name), _deviceIn(in), _deviceOut(out)
 {
     PmError errorIn = Pm_OpenInput(&_midiInStream, _deviceIn, nullptr, 1, nullptr, nullptr);
     PmError errorOut = Pm_OpenOutput(&_midiOutStream, _deviceOut, nullptr, 1, nullptr, nullptr, 0);
@@ -50,7 +48,7 @@ Controler::Controler(std::string name, PmDeviceID in, PmDeviceID out) : _name(na
     }
 }
 
-Controler::~Controler()
+Controller::~Controller()
 {
     Pm_Close(_midiInStream);
     Pm_Close(_midiOutStream);
@@ -58,28 +56,36 @@ Controler::~Controler()
 
 // INPUT FUNCTIONS
 
-void Controler::processMidiInput() {
+/*
+void Controller::processMidiInput()
+{
     PmEvent buffer[BUFFER_SIZE];
 
-    while (true) {
+    while (true)
+    {
         int numEvents = Pm_Read(_midiInStream, buffer, BUFFER_SIZE);
 
-        if (numEvents < 0) {
-            std::cerr << "Error (process input) "<< Pm_GetErrorText((PmError) numEvents) << std::endl;
+        if (numEvents < 0)
+        {
+            std::cerr << "Error (process input) " << Pm_GetErrorText((PmError)numEvents) << std::endl;
             break;
         }
 
-        for (int i = 0; i < numEvents; ++i) {
+        for (int i = 0; i < numEvents; ++i)
+        {
             PmEvent event = buffer[i];
 
             int messageType = Pm_MessageStatus(event.message);
             int channel = Pm_MessageStatus(event.message);
 
-            if (messageType == 0x90) {  // Note On
+            if (messageType == 0x90)
+            { // Note On
                 int note = Pm_MessageData1(event.message);
                 int velocity = Pm_MessageData2(event.message);
                 std::cout << "Note On - Channel: " << channel << ", Note: " << note << ", Velocity: " << velocity << std::endl;
-            } else if (messageType == 0xB0) {  // Control Change
+            }
+            else if (messageType == 0xB0)
+            { // Control Change
                 int controller = Pm_MessageData1(event.message);
                 int value = Pm_MessageData2(event.message);
                 std::cout << "Control Change - Channel: " << channel << ", Controller: " << controller << ", Value: " << value << std::endl;
@@ -88,10 +94,63 @@ void Controler::processMidiInput() {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
+*/
+
+// Process incoming MIDI events
+void Controller::processMidiInput()
+{
+    while (true)
+    {
+        int numEvents = Pm_Read(_midiInStream, midiEvent.events + midiEvent.endIdx, BUFFER_SIZE - midiEvent.endIdx);
+        if (numEvents < 0)
+        {
+            std::cerr << "Error (process input) " << Pm_GetErrorText((PmError) numEvents) << std::endl;
+            break;
+        }
+
+        // update endIdx atomically
+        std::unique_lock<std::mutex> lock(midiEvent.mutex);
+        midiEvent.endIdx = (midiEvent.endIdx + numEvents) % BUFFER_SIZE;
+        lock.unlock();
+        midiEvent.cv.notify_one();
+    }
+}
+
+void Controller::processMidiEvents()
+{
+    while (true)
+    {
+        std::unique_lock<std::mutex> lock(midiEvent.mutex);
+        midiEvent.cv.wait(lock, [&]
+                          { return midiEvent.startIdx != midiEvent.endIdx; });
+
+        // process MIDI events in the circular buffer
+        while (midiEvent.startIdx != midiEvent.endIdx)
+        {
+            PmEvent event = midiEvent.events[midiEvent.startIdx];
+            midiEvent.startIdx = (midiEvent.startIdx + 1) % BUFFER_SIZE;
+
+            int channel = Pm_MessageStatus(event.message);
+            int controller = Pm_MessageData1(event.message);
+            int value = Pm_MessageData2(event.message);
+            std::cout << "> chn: " << channel << ", btn: " << controller << ", val: " << value << std::endl;
+        }
+
+        lock.unlock();
+    }
+}
+
+void Controller::startInputThreads() {
+    std::thread inputThread(&Controller::processMidiInput, this);
+    std::thread eventThread(&Controller::processMidiEvents, this);
+
+    inputThread.join();
+    eventThread.join();
+}
 
 // OUTPUT FUNCTIONS
 
-void Controler::setLight(int const &button, int const &value)
+void Controller::setLight(int const &button, int const &value)
 {
     PmEvent midiEvent;
     midiEvent.message = Pm_Message(0x90, button, value);
@@ -99,7 +158,7 @@ void Controler::setLight(int const &button, int const &value)
     Pm_Write(_midiOutStream, &midiEvent, 1);
 }
 
-void Controler::setLight(std::vector<int> const &buttons, int const &value)
+void Controller::setLight(std::vector<int> const &buttons, int const &value)
 {
     for (int i : buttons)
     {
@@ -107,7 +166,7 @@ void Controler::setLight(std::vector<int> const &buttons, int const &value)
     }
 }
 
-void Controler::setAllLights(int const &status)
+void Controller::setAllLights(int const &status)
 {
     for (size_t i = 0; i < XTOUCH_NB_OF_BUTTONS; i++)
     {
@@ -115,28 +174,28 @@ void Controler::setAllLights(int const &status)
     }
 }
 
-void Controler::allLightsRed(int const &status)
+void Controller::allLightsRed(int const &status)
 {
     for (int i : XTOUCH_RED)
     {
         setLight(i, status);
     }
 }
-void Controler::allLightsBlue(int const &status)
+void Controller::allLightsBlue(int const &status)
 {
     for (int i : XTOUCH_BLUE)
     {
         setLight(i, status);
     }
 }
-void Controler::allLightsGreen(int const &status)
+void Controller::allLightsGreen(int const &status)
 {
     for (int i : XTOUCH_GREEN)
     {
         setLight(i, status);
     }
 }
-void Controler::allLightsYellow(int const &status)
+void Controller::allLightsYellow(int const &status)
 {
     for (int i : XTOUCH_YELLOW)
     {

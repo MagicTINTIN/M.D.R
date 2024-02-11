@@ -4,17 +4,6 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                // "/usr/include/glibmm-2.4",
-                // "/usr/include/gtkmm-2.4",
-                // "/usr/include/glib-2.4",
-                // "/usr/lib/x86_64-linux-gnu/glibmm-2.4/include",
-                // "/usr/include/glib-2.0",
-                // "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
-                // "/usr/include/sigc++-2.0/sigc++",
-                // "/usr/include/sigc++-2.0",
-                // "/usr/lib/x86_64-linux-gnu/sigc++-2.0/include"
-                //
-                // echo `pkg-config --cflags --libs gtkmm-2.4`
                 "/usr/include/gtkmm-2.4",
                 "/usr/lib/x86_64-linux-gnu/gtkmm-2.4/include",
                 "/usr/include/atkmm-1.6",
@@ -48,7 +37,8 @@
                 "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
                 "/usr/include/uuid",
                 "/usr/include/freetype2",
-                "/usr/include/libpng16"
+                "/usr/include/libpng16",
+                "${workspaceFolder}/source/midi"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

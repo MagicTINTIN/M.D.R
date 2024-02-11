@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include "portmidi.h"
 #include "communication.hh"
-#include "controler.hh"
+#include "controller.hh"
 #include "xtouch.hh"
 
-void demoLights(Controler &surface);
-void initAnim(Controler &surface);
+void demoLights(Controller &surface);
+void initAnim(Controller &surface);

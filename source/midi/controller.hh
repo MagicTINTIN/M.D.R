@@ -4,17 +4,32 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 #include "portmidi.h"
+#define BUFFER_SIZE 1024
 
-class Controler
+
+struct MidiEvent {
+    PmEvent events[BUFFER_SIZE];
+    int startIdx;
+    int endIdx;
+    std::mutex mutex;
+    std::condition_variable cv;
+
+    MidiEvent() : startIdx(0), endIdx(0) {}
+};
+
+class Controller
 {
 public:
-    Controler(std::string name, PmDeviceID in, PmDeviceID out);
-    ~Controler();
+    Controller(std::string name, PmDeviceID in, PmDeviceID out);
+    ~Controller();
 
     //----- in -----//
 
-    void processMidiInput();
+    void startInputThreads();
 
     //----- out -----//
 
@@ -47,6 +62,9 @@ private:
     PmDeviceID _deviceOut;
     PmStream *_midiInStream;
     PmStream *_midiOutStream;
+    MidiEvent midiEvent;
+    void processMidiInput();
+    void processMidiEvents();
 };
 
 bool findController(PmDeviceID &in, PmDeviceID &out, std::string const &name);

@@ -6,12 +6,12 @@
 #include <unistd.h>
 #include <random>
 #include "portmidi.h"
-#include "controler.hh"
+#include "controller.hh"
 #include "communication.hh"
 #include "xtouch.hh"
 #include "animations.hh"
 
-void Controler::animRandom(int const &steps, int const &stepTime, bool const &blinking)
+void Controller::animRandom(int const &steps, int const &stepTime, bool const &blinking)
 {
     int type(0), btn(0);
     if (blinking)
@@ -38,7 +38,7 @@ void Controler::animRandom(int const &steps, int const &stepTime, bool const &bl
         }
 }
 
-void Controler::animChaser(int const &stepTime, bool const &reverse)
+void Controller::animChaser(int const &stepTime, bool const &reverse)
 {
     if (reverse)
         for (size_t i = XTOUCH_NB_OF_BUTTONS - 1; i >= 0; i--)
@@ -56,7 +56,7 @@ void Controler::animChaser(int const &stepTime, bool const &reverse)
         }
 }
 
-void Controler::animFilledChaser(int const &stepTime, bool const &reverse)
+void Controller::animFilledChaser(int const &stepTime, bool const &reverse)
 {
     if (reverse)
     {
@@ -86,7 +86,7 @@ void Controler::animFilledChaser(int const &stepTime, bool const &reverse)
     }
 }
 
-void Controler::animColumns(int const &stepTime, bool const &reverse)
+void Controller::animColumns(int const &stepTime, bool const &reverse)
 {
     if (reverse)
         for (signed int i = XTOUCH_COLUMNS.size() - 1; i >= 0; i--)
@@ -104,7 +104,7 @@ void Controler::animColumns(int const &stepTime, bool const &reverse)
         }
 }
 
-void Controler::animFilledColumns(int const &stepTime, bool const &reverse)
+void Controller::animFilledColumns(int const &stepTime, bool const &reverse)
 {
     if (reverse)
     {
@@ -134,7 +134,7 @@ void Controler::animFilledColumns(int const &stepTime, bool const &reverse)
     }
 }
 
-void Controler::animRows(int const &stepTime, bool const &reverse)
+void Controller::animRows(int const &stepTime, bool const &reverse)
 {
     if (reverse)
         for (signed int i = XTOUCH_ROWS.size() - 1; i >= 0; i--)
@@ -152,7 +152,7 @@ void Controler::animRows(int const &stepTime, bool const &reverse)
         }
 }
 
-void Controler::animFilledRows(int const &stepTime, bool const &reverse)
+void Controller::animFilledRows(int const &stepTime, bool const &reverse)
 {
     if (reverse)
     {
@@ -182,7 +182,7 @@ void Controler::animFilledRows(int const &stepTime, bool const &reverse)
     }
 }
 
-void Controler::animUpperLeftCross(int const &stepTime, bool const &reverse)
+void Controller::animUpperLeftCross(int const &stepTime, bool const &reverse)
 {
     if (reverse)
         for (signed int i = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size()) - 1; i >= 0; i--)
@@ -212,7 +212,7 @@ void Controler::animUpperLeftCross(int const &stepTime, bool const &reverse)
         }
 }
 
-void Controler::animFilledUpperLeftCross(int const &stepTime, bool const &reverse)
+void Controller::animFilledUpperLeftCross(int const &stepTime, bool const &reverse)
 {
     if (reverse)
     {
@@ -254,7 +254,7 @@ void Controler::animFilledUpperLeftCross(int const &stepTime, bool const &revers
     }
 }
 
-void Controler::animUpperRightCross(int const &stepTime, bool const &reverse)
+void Controller::animUpperRightCross(int const &stepTime, bool const &reverse)
 {
     const int MAX_ROWS_COLS = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size());
     if (reverse)
@@ -285,7 +285,7 @@ void Controler::animUpperRightCross(int const &stepTime, bool const &reverse)
         }
 }
 
-void Controler::animFilledUpperRightCross(int const &stepTime, bool const &reverse)
+void Controller::animFilledUpperRightCross(int const &stepTime, bool const &reverse)
 {
     const int MAX_ROWS_COLS = std::max(XTOUCH_ROWS.size(), XTOUCH_COLUMNS.size());
     if (reverse)
@@ -328,7 +328,7 @@ void Controler::animFilledUpperRightCross(int const &stepTime, bool const &rever
     }
 }
 
-void Controler::animColors(int const &stepTime)
+void Controller::animColors(int const &stepTime)
 {
     allLightsRed(XTOUCH_STATUS_ON);
     usleep(1000 * stepTime);
@@ -344,7 +344,7 @@ void Controler::animColors(int const &stepTime)
     allLightsBlue(XTOUCH_STATUS_OFF);
 }
 
-void demoLights(Controler &surface)
+void demoLights(Controller &surface)
 {
     surface.setAllLights(XTOUCH_STATUS_OFF);
     surface.animChaser(20);
@@ -382,7 +382,7 @@ void demoLights(Controler &surface)
     surface.animRandom(-1, 80, false);
 }
 
-void initAnim(Controler &surface)
+void initAnim(Controller &surface)
 {
     surface.setAllLights(XTOUCH_STATUS_OFF);
     surface.animUpperRightCross(50);
