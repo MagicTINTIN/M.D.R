@@ -386,5 +386,52 @@ void initAnim(Controller &surface)
 {
     surface.setAllLights(XTOUCH_STATUS_OFF);
     surface.animUpperRightCross(50);
+    surface.animFilledFaders(50);
     surface.animFilledColumns(25);
+}
+
+void Controller::animFaders(int const &stepTime, bool const &reverse)
+{
+    if (reverse)
+        for (signed int i = XTOUCH_FADERS.size() - 1; i >= 0; i--)
+        {
+            setFader(XTOUCH_FADERS[i], XTOUCH_STATUS_ON);
+            usleep(1000 * stepTime);
+            setFader(XTOUCH_FADERS[i], XTOUCH_STATUS_OFF);
+        }
+    else
+        for (size_t i = 0; i < XTOUCH_FADERS.size(); i++)
+        {
+            setFader(XTOUCH_FADERS[i], XTOUCH_STATUS_ON);
+            usleep(1000 * stepTime);
+            setFader(XTOUCH_FADERS[i], XTOUCH_STATUS_OFF);
+        }
+}
+
+void Controller::animFilledFaders(int const &stepTime, bool const &reverse)
+{
+    if (reverse) {
+        for (signed int i = XTOUCH_FADERS.size() - 1; i >= 0; i--)
+        {
+            setFader(XTOUCH_FADERS[i], XTOUCH_STATUS_ON);
+            usleep(1000 * stepTime);
+        }
+        for (signed int i = XTOUCH_FADERS.size() - 1; i >= 0; i--)
+        {
+            setFader(XTOUCH_FADERS[i], XTOUCH_STATUS_OFF);
+            usleep(1000 * stepTime);
+        }
+    }
+    else {
+        for (size_t i = 0; i < XTOUCH_FADERS.size(); i++)
+        {
+            setFader(XTOUCH_FADERS[i], XTOUCH_STATUS_ON);
+            usleep(1000 * stepTime);
+        }
+        for (size_t i = 0; i < XTOUCH_FADERS.size(); i++)
+        {
+            setFader(XTOUCH_FADERS[i], XTOUCH_STATUS_OFF);
+            usleep(1000 * stepTime);
+        }
+    }
 }

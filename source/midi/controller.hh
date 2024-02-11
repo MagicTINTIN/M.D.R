@@ -43,6 +43,13 @@ public:
     void allLightsGreen(int const &status);
     void allLightsYellow(int const &status);
 
+    // faders
+    void setFader(int const &fader, int const &value);
+    void setFader(std::vector<int> const &faders, int const &value);
+
+    // lcd
+    void setLCD();
+
     // animations
     void animRandom(int const &steps, int const &stepTime, bool const &blinking = false);
     void animChaser(int const &stepTime, bool const &reverse = false);
@@ -56,12 +63,14 @@ public:
     void animUpperRightCross(int const &stepTime, bool const &reverse = false);
     void animFilledUpperRightCross(int const &stepTime, bool const &reverse = false);
     void animColors(int const &stepTime);
-    // faders
-    void setFader(int const &fader, int const &value);
-    void setFader(std::vector<int> const &faders, int const &value);
 
-    // lcd
-    void setLCD();
+    void animFaders(int const &stepTime, bool const &reverse = false);
+    void animFilledFaders(int const &stepTime, bool const &reverse = false);
+
+    // other
+    void manual(int const &ch, int const &bt, int const &val);
+    void analyser(int const &chStart, int const &chEnd, int const &btStart, int const &btEnd, int const &valStart, int const &valEnd, int const &stepTime);
+
 private:
     std::string _name;
     PmDeviceID _deviceIn;

@@ -3,6 +3,7 @@
 #include <atomic>
 #include <cstring>
 #include <string>
+#include <unistd.h>
 #include "portmidi.h"
 #include "controller.hh"
 #include "communication.hh"
@@ -119,7 +120,8 @@ void Controller::processMidiEvents()
             int value = Pm_MessageData2(event.message);
             std::cout << "> chn: " << channel << ", btn: " << button << ", val: " << value << std::endl;
 
-            if (channel == XTOUCH_BUTTONS_CH && button < XTOUCH_NB_OF_BUTTONS) {
+            if (channel == XTOUCH_BUTTONS_CH && button < XTOUCH_NB_OF_BUTTONS)
+            {
                 setLight(button, value);
             }
         }
@@ -194,7 +196,7 @@ void Controller::allLightsYellow(int const &status)
 void Controller::setFader(int const &fader, int const &value)
 {
     PmEvent portmidiEvent;
-    portmidiEvent.message = Pm_Message(XTOUCH_FADERS[fader], 124, value);
+    portmidiEvent.message = Pm_Message(fader, 0, value);
     portmidiEvent.timestamp = 0;
     Pm_Write(_midiOutStream, &portmidiEvent, 1);
 }
@@ -209,12 +211,38 @@ void Controller::setFader(std::vector<int> const &faders, int const &value)
 
 void Controller::setLCD()
 {
-    //unsigned char msg[] = {0xF0, 0x00, 0x00, 0x66, 0x58, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7};
+    // unsigned char msg[] = {0xF0, 0x00, 0x00, 0x66, 0x58, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7};
     unsigned char sysexMessage[] = {
-        0xF0, 0x00, 0x00, 0x66, 0x58, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7
-    };
+        0xF0, 0x00, 0x00, 0x66, 0x58, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7};
     PmError error = Pm_WriteSysEx(_midiOutStream, 0, sysexMessage);
-    if (error != pmNoError) {
+    if (error != pmNoError)
+    {
         std::cerr << "Error sending SysEx message: " << Pm_GetErrorText(error) << std::endl;
+    }
+}
+
+void Controller::manual(int const &ch, int const &bt, int const &val)
+{
+    PmEvent portmidiEvent;
+    portmidiEvent.message = Pm_Message(ch, bt, val);
+    portmidiEvent.timestamp = 0;
+    Pm_Write(_midiOutStream, &portmidiEvent, 1);
+}
+
+void Controller::analyser(int const &chStart, int const &chEnd, int const &btStart, int const &btEnd, int const &valStart, int const &valEnd, int const &stepTime)
+{
+    for (size_t c = chStart; c <= chEnd; c++)
+    {
+        for (size_t b = btStart; b <= btEnd; b++)
+        {
+            for (size_t v = valStart; v <= valEnd; v++)
+            {
+                PmEvent portmidiEvent;
+                portmidiEvent.message = Pm_Message(c, b, v);
+                portmidiEvent.timestamp = 0;
+                Pm_Write(_midiOutStream, &portmidiEvent, 1);
+                usleep(1000 * stepTime);
+            }
+        }
     }
 }
