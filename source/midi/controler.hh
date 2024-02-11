@@ -12,6 +12,12 @@ public:
     Controler(std::string name, PmDeviceID in, PmDeviceID out);
     ~Controler();
 
+    //----- in -----//
+
+    void processMidiInput();
+
+    //----- out -----//
+
     // lights
     void setLight(int const &button, int const &value);
     void setLight(std::vector<int> const &buttons, int const &value);

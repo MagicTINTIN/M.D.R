@@ -344,7 +344,8 @@ void Controler::animColors(int const &stepTime)
     allLightsBlue(XTOUCH_STATUS_OFF);
 }
 
-void demoLights(Controler &surface) {
+void demoLights(Controler &surface)
+{
     surface.setAllLights(XTOUCH_STATUS_OFF);
     surface.animChaser(20);
     surface.animFilledChaser(5, true);
@@ -379,4 +380,11 @@ void demoLights(Controler &surface) {
     surface.animUpperLeftCross(60);
     surface.animFilledRows(30);
     surface.animRandom(-1, 80, false);
+}
+
+void initAnim(Controler &surface)
+{
+    surface.setAllLights(XTOUCH_STATUS_OFF);
+    surface.animUpperRightCross(50);
+    surface.animFilledColumns(25);
 }

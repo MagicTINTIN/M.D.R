@@ -8,3 +8,4 @@
 #include "xtouch.hh"
 
 void demoLights(Controler &surface);
+void initAnim(Controler &surface);

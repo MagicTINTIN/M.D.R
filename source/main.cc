@@ -28,7 +28,8 @@ int main()
     }
     Controler surface(surfaceName, dInputId, dOutputId);
 
-    demoLights(surface);
+    initAnim(surface);
+    surface.processMidiInput();
 
     terminatePortMidi();
     std::cout << "Ending mdr\n";
