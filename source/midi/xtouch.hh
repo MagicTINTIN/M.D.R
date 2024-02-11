@@ -2,13 +2,18 @@
 
 #include <vector>
 
+// group channels
+
+const int XTOUCH_BUTTONS_CH = 144;
+const int XTOUCH_ENCODERS_CH = 176;
+
 // values
 
 const int XTOUCH_STATUS_OFF = 0;
 const int XTOUCH_STATUS_BLINK = 1;
 const int XTOUCH_STATUS_ON = 127;
 
-// Buttons
+// buttons
 const int XTOUCH_NB_OF_BUTTONS = 102;
 
 // channels buttons
@@ -214,3 +219,58 @@ const std::vector<std::vector<int>> XTOUCH_ROWS = {
     {98, 100, 99},
     {97}
 };
+
+// faders press button allways 0
+const int XTOUCH_FADER_PRESS_1 = 104;
+const int XTOUCH_FADER_PRESS_2 = 105;
+const int XTOUCH_FADER_PRESS_3 = 106;
+const int XTOUCH_FADER_PRESS_4 = 107;
+const int XTOUCH_FADER_PRESS_5 = 108;
+const int XTOUCH_FADER_PRESS_6 = 109;
+const int XTOUCH_FADER_PRESS_7 = 110;
+const int XTOUCH_FADER_PRESS_8 = 111;
+const int XTOUCH_FADER_PRESS_M = 112;
+
+// button is a weird value 
+const int XTOUCH_FADER_1_CH = 224;
+const int XTOUCH_FADER_2_CH = 225;
+const int XTOUCH_FADER_3_CH = 226;
+const int XTOUCH_FADER_4_CH = 227;
+const int XTOUCH_FADER_5_CH = 228;
+const int XTOUCH_FADER_6_CH = 229;
+const int XTOUCH_FADER_7_CH = 230;
+const int XTOUCH_FADER_8_CH = 231;
+const int XTOUCH_FADER_M_CH = 232;
+
+const std::vector<int> XTOUCH_FADERS = {
+    224,225,226,227,228,229,230,231,232
+};
+
+// encoders
+const int XTOUCH_ENCODER1 = 16;
+const int XTOUCH_ENCODER2 = 17;
+const int XTOUCH_ENCODER3 = 18;
+const int XTOUCH_ENCODER4 = 19;
+const int XTOUCH_ENCODER5 = 20;
+const int XTOUCH_ENCODER6 = 21;
+const int XTOUCH_ENCODER7 = 22;
+const int XTOUCH_ENCODER8 = 23;
+
+const std::vector<int> XTOUCH_ENCODERS = {
+    16,17,18,19,20,21,22,23
+};
+
+const int XTOUCH_ENCODER_PUSH1 = 32;
+const int XTOUCH_ENCODER_PUSH2 = 33;
+const int XTOUCH_ENCODER_PUSH3 = 34;
+const int XTOUCH_ENCODER_PUSH4 = 35;
+const int XTOUCH_ENCODER_PUSH5 = 36;
+const int XTOUCH_ENCODER_PUSH6 = 37;
+const int XTOUCH_ENCODER_PUSH7 = 38;
+const int XTOUCH_ENCODER_PUSH8 = 39;
+
+const std::vector<int> XTOUCH_ENCODER_PUSHS = {
+    32,33,34,35,36,37,38,39
+};
+
+const int XTOUCH_JOG_WHEEL = 60;

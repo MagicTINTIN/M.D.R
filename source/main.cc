@@ -28,8 +28,14 @@ int main()
     }
     Controller surface(surfaceName, dInputId, dOutputId);
 
+    surface.setLCD();
     initAnim(surface);
+    
+    surface.setFader(XTOUCH_FADERS, 127);
+
     surface.startInputThreads();
+
+    surface.setAllLights(XTOUCH_STATUS_ON);
 
     terminatePortMidi();
     std::cout << "Ending mdr\n";

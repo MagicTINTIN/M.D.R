@@ -8,10 +8,11 @@
 #include <mutex>
 #include <condition_variable>
 #include "portmidi.h"
-#define BUFFER_SIZE 1024 * 2
-#define AUX_BUFFER_SIZE 1024 * 2
+#define BUFFER_SIZE 512
+#define AUX_BUFFER_SIZE 512
 
-struct MidiEvent {
+struct MidiEvent
+{
     PmEvent events[AUX_BUFFER_SIZE];
     int startIdx;
     int endIdx;
@@ -55,7 +56,12 @@ public:
     void animUpperRightCross(int const &stepTime, bool const &reverse = false);
     void animFilledUpperRightCross(int const &stepTime, bool const &reverse = false);
     void animColors(int const &stepTime);
+    // faders
+    void setFader(int const &fader, int const &value);
+    void setFader(std::vector<int> const &faders, int const &value);
 
+    // lcd
+    void setLCD();
 private:
     std::string _name;
     PmDeviceID _deviceIn;
