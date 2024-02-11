@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <atomic>
 #include <cstring>
 #include <string>
 #include "portmidi.h"
@@ -104,43 +105,52 @@ void Controller::processMidiInput()
         int numEvents = Pm_Read(_midiInStream, midiEvent.events + midiEvent.endIdx, BUFFER_SIZE - midiEvent.endIdx);
         if (numEvents < 0)
         {
-            std::cerr << "Error (process input) " << Pm_GetErrorText((PmError) numEvents) << std::endl;
+            std::cerr << "Error reading MIDI input: " << Pm_GetErrorText((PmError) numEvents) << std::endl;
             break;
         }
 
-        // update endIdx atomically
-        std::unique_lock<std::mutex> lock(midiEvent.mutex);
-        midiEvent.endIdx = (midiEvent.endIdx + numEvents) % BUFFER_SIZE;
-        lock.unlock();
-        midiEvent.cv.notify_one();
+        // Update endIdx atomically
+        int newEndIdx = (midiEvent.endIdx + numEvents) % BUFFER_SIZE;
+        midiEvent.endIdx.store(newEndIdx, std::memory_order_relaxed);
     }
 }
 
+// Function to process MIDI events from the circular buffer
 void Controller::processMidiEvents()
 {
     while (true)
     {
-        std::unique_lock<std::mutex> lock(midiEvent.mutex);
-        midiEvent.cv.wait(lock, [&]
-                          { return midiEvent.startIdx != midiEvent.endIdx; });
+        // Load startIdx and endIdx atomically
+        int startIdx = midiEvent.startIdx.load(std::memory_order_relaxed);
+        int endIdx = midiEvent.endIdx.load(std::memory_order_relaxed);
 
-        // process MIDI events in the circular buffer
-        while (midiEvent.startIdx != midiEvent.endIdx)
+        if (startIdx != endIdx)
         {
-            PmEvent event = midiEvent.events[midiEvent.startIdx];
-            midiEvent.startIdx = (midiEvent.startIdx + 1) % BUFFER_SIZE;
+            // Process MIDI events in the circular buffer
+            while (startIdx != endIdx)
+            {
+                PmEvent event = midiEvent.events[startIdx];
+                startIdx = (startIdx + 1) % BUFFER_SIZE;
 
-            int channel = Pm_MessageStatus(event.message);
-            int controller = Pm_MessageData1(event.message);
-            int value = Pm_MessageData2(event.message);
-            std::cout << "> chn: " << channel << ", btn: " << controller << ", val: " << value << std::endl;
+                // Process the MIDI event as needed
+                // (assuming Behringer X Touch MIDI message format)
+
+                int messageType = Pm_MessageStatus(event.message);
+
+                int channel = Pm_MessageStatus(event.message);
+                int controller = Pm_MessageData1(event.message);
+                int value = Pm_MessageData2(event.message);
+                std::cout << "> chn: " << channel << ", btn: " << controller << ", val: " << value << std::endl;
+            }
         }
 
-        lock.unlock();
+        // Update startIdx atomically
+        midiEvent.startIdx.store(startIdx, std::memory_order_relaxed);
     }
 }
 
-void Controller::startInputThreads() {
+void Controller::startInputThreads()
+{
     std::thread inputThread(&Controller::processMidiInput, this);
     std::thread eventThread(&Controller::processMidiEvents, this);
 
