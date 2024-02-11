@@ -1,10 +1,13 @@
 #include <iostream>
+#include <thread>
 #include <cstring>
 #include <string>
 #include "portmidi.h"
 #include "controler.hh"
 #include "communication.hh"
 #include "xtouch.hh"
+
+#define BUFFER_SIZE 1024
 
 bool findController(PmDeviceID &in, PmDeviceID &out, std::string const &name)
 {
@@ -52,6 +55,41 @@ Controler::~Controler()
     Pm_Close(_midiInStream);
     Pm_Close(_midiOutStream);
 }
+
+// INPUT FUNCTIONS
+
+void Controler::processMidiInput() {
+    PmEvent buffer[BUFFER_SIZE];
+
+    while (true) {
+        int numEvents = Pm_Read(_midiInStream, buffer, BUFFER_SIZE);
+
+        if (numEvents < 0) {
+            std::cerr << "Error (process input) "<< Pm_GetErrorText((PmError) numEvents) << std::endl;
+            break;
+        }
+
+        for (int i = 0; i < numEvents; ++i) {
+            PmEvent event = buffer[i];
+
+            int messageType = Pm_MessageStatus(event.message);
+            int channel = Pm_MessageStatus(event.message);
+
+            if (messageType == 0x90) {  // Note On
+                int note = Pm_MessageData1(event.message);
+                int velocity = Pm_MessageData2(event.message);
+                std::cout << "Note On - Channel: " << channel << ", Note: " << note << ", Velocity: " << velocity << std::endl;
+            } else if (messageType == 0xB0) {  // Control Change
+                int controller = Pm_MessageData1(event.message);
+                int value = Pm_MessageData2(event.message);
+                std::cout << "Control Change - Channel: " << channel << ", Controller: " << controller << ", Value: " << value << std::endl;
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
+
+// OUTPUT FUNCTIONS
 
 void Controler::setLight(int const &button, int const &value)
 {
