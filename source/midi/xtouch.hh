@@ -8,13 +8,28 @@ const unsigned char XTOUCH_COM_START = 0xF0;
 const std::vector<unsigned char> XTOUCH_COM_HEADER = {0x00, 0x00, 0x66, 0x14};
 const unsigned char XTOUCH_COM_END = 0xF7;
 
+// sysex screen values
+
+// screen colors
 const unsigned char XTOUCH_COM_SCREEN_COLOR = 0x72;
+const unsigned char XTOUCH_SCREEN_BLACK = 0;
+const unsigned char XTOUCH_SCREEN_RED = 1;
+const unsigned char XTOUCH_SCREEN_GREEN = 2;
+const unsigned char XTOUCH_SCREEN_YELLOW = 3;
+const unsigned char XTOUCH_SCREEN_BLUE = 4;
+const unsigned char XTOUCH_SCREEN_PURPLE = 5;
+const unsigned char XTOUCH_SCREEN_CYAN = 6;
+const unsigned char XTOUCH_SCREEN_WHITE = 7;
+const unsigned char XTOUCH_SCREEN_RAINBOW[] = {1, 3, 2, 6, 4, 5};
+const unsigned char XTOUCH_RAINBOW_SIZE = 6;
 
 // group channels
 
 const int XTOUCH_BUTTONS_CH = 144;
 const int XTOUCH_ENCODERS_CH = 176;
 const int XTOUCH_SOUNDPEAKS_CH = 208;
+
+const std::vector<int> XTOUCH_CHANNELS = {1, 2, 3, 4, 5, 6, 7, 8};
 
 // values
 
@@ -133,34 +148,31 @@ const int XTOUCH_ZOOM = 100;
 // other
 const int XTOUCH_SCRUB = 101;
 
-const std::vector<int> XTOUCH_RED = {
-    //REC
+const std::vector<int> XTOUCH_BTN_RED = {
+    // REC
     0, 1, 2, 3, 4, 5, 6, 7,
-    //MUTE
+    // MUTE
     16, 17, 18, 19, 20, 21, 22, 23,
     // write and save
     75, 80,
     // drop and replace
     87, 88,
     // main rec and scrub
-    95, 101
-};
+    95, 101};
 
-const std::vector<int> XTOUCH_BLUE = {
+const std::vector<int> XTOUCH_BTN_BLUE = {
     // zoom
-    100
-};
+    100};
 
-const std::vector<int> XTOUCH_GREEN = {
+const std::vector<int> XTOUCH_BTN_GREEN = {
     // select
     24, 25, 26, 27, 28, 29, 30, 31,
     // read group undo
     74, 79, 81,
     // marker nudge cycle clic and play
-    84, 85, 86, 89
-};
+    84, 85, 86, 89};
 
-const std::vector<int> XTOUCH_YELLOW = {
+const std::vector<int> XTOUCH_BTN_YELLOW = {
     // solo
     8, 9, 10, 11, 12, 13, 14, 15,
     // encoder assign
@@ -178,8 +190,7 @@ const std::vector<int> XTOUCH_YELLOW = {
     // transport and pause
     90, 91, 92, 93,
     // move
-    96, 97, 98, 99
-};
+    96, 97, 98, 99};
 
 const std::vector<std::vector<int>> XTOUCH_COLUMNS = {
     // channels
@@ -226,8 +237,7 @@ const std::vector<std::vector<int>> XTOUCH_ROWS = {
     {48, 49},
     {96},
     {98, 100, 99},
-    {97}
-};
+    {97}};
 
 // faders press button allways 0
 const int XTOUCH_FADER_PRESS_1 = 104;
@@ -240,7 +250,7 @@ const int XTOUCH_FADER_PRESS_7 = 110;
 const int XTOUCH_FADER_PRESS_8 = 111;
 const int XTOUCH_FADER_PRESS_M = 112;
 
-// button is a weird value 
+// button is a weird value
 const int XTOUCH_FADER_1_CH = 224;
 const int XTOUCH_FADER_2_CH = 225;
 const int XTOUCH_FADER_3_CH = 226;
@@ -252,8 +262,7 @@ const int XTOUCH_FADER_8_CH = 231;
 const int XTOUCH_FADER_M_CH = 232;
 
 const std::vector<int> XTOUCH_FADERS = {
-    224,225,226,227,228,229,230,231,232
-};
+    224, 225, 226, 227, 228, 229, 230, 231, 232};
 
 // encoders
 const int XTOUCH_ENCODER1 = 16;
@@ -266,8 +275,7 @@ const int XTOUCH_ENCODER7 = 22;
 const int XTOUCH_ENCODER8 = 23;
 
 const std::vector<int> XTOUCH_ENCODERS = {
-    16,17,18,19,20,21,22,23
-};
+    16, 17, 18, 19, 20, 21, 22, 23};
 
 const int XTOUCH_ENCODER_PUSH1 = 32;
 const int XTOUCH_ENCODER_PUSH2 = 33;
@@ -279,7 +287,6 @@ const int XTOUCH_ENCODER_PUSH7 = 38;
 const int XTOUCH_ENCODER_PUSH8 = 39;
 
 const std::vector<int> XTOUCH_ENCODER_PUSHS = {
-    32,33,34,35,36,37,38,39
-};
+    32, 33, 34, 35, 36, 37, 38, 39};
 
 const int XTOUCH_JOG_WHEEL = 60;

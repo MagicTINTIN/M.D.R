@@ -40,10 +40,10 @@ public:
     void setLight(std::vector<int> const &buttons, std::vector<int> const &values);
     
     void setAllLights(int const &status);
-    void allLightsRed(int const &status);
-    void allLightsBlue(int const &status);
-    void allLightsGreen(int const &status);
-    void allLightsYellow(int const &status);
+    void allLightsRed(int const &status, bool const &withLCDs = false);
+    void allLightsBlue(int const &status, bool const &withLCDs = false);
+    void allLightsGreen(int const &status, bool const &withLCDs = false);
+    void allLightsYellow(int const &status, bool const &withLCDs = false);
 
     // sound peaks
 
@@ -57,7 +57,9 @@ public:
     void setFader(std::vector<int> const &faders, std::vector<int> const &values);
 
     // lcd
-    void setLCD();
+    void setLCDColor(int const &lcd, unsigned char const &color);
+    void setLCDColor(std::vector<int> const &lcds, unsigned char const &color);
+    void setLCDColor(std::vector<int> const &lcds, std::vector<unsigned char> const &colors);
 
     // animations
     void animRandom(int const &steps, int const &stepTime, bool const &blinking = false);
@@ -71,10 +73,12 @@ public:
     void animFilledUpperLeftCross(int const &stepTime, bool const &reverse = false);
     void animUpperRightCross(int const &stepTime, bool const &reverse = false);
     void animFilledUpperRightCross(int const &stepTime, bool const &reverse = false);
-    void animColors(int const &stepTime);
+    void animColors(int const &stepTime, bool const &withLCDs = false);
 
     void animFaders(int const &stepTime, bool const &reverse = false);
     void animFilledFaders(int const &stepTime, bool const &reverse = false);
+
+    void animLCDRainbow(int const &stepTime, int const &numberOfLoops, bool const &reverse = false);
 
     // other
     void manual(int const &ch, int const &bt, int const &val);
@@ -88,8 +92,10 @@ private:
     PmStream *_midiInStream;
     PmStream *_midiOutStream;
     MidiEvent _midiEvent;
-    unsigned char xTouchColors[8] = {0};
+    unsigned char xTouchColors[8] = {0,0,0,0,0,0,0,0};
 
+    void updateLCDColorsMemory(int const &lcd, unsigned char const &color);
+    void refreshLCDColors();
     void processMidiInput();
     void processMidiEvents();
 };

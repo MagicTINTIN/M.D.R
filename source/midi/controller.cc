@@ -48,6 +48,9 @@ Controller::Controller(std::string name, PmDeviceID in, PmDeviceID out) : _name(
     {
         std::cerr << "Error opening " << _name << " MIDI output: " << Pm_GetErrorText(errorOut) << std::endl;
     }
+    refreshLCDColors();
+    setFader(XTOUCH_FADERS, 0);
+    setAllLights(XTOUCH_STATUS_OFF);
 }
 
 Controller::~Controller()
@@ -175,33 +178,41 @@ void Controller::setAllLights(int const &status)
     }
 }
 
-void Controller::allLightsRed(int const &status)
+void Controller::allLightsRed(int const &status, bool const &withLCDs)
 {
-    for (int i : XTOUCH_RED)
+    for (int i : XTOUCH_BTN_RED)
     {
         setLight(i, status);
     }
+    if (withLCDs)
+        setLCDColor(XTOUCH_CHANNELS, XTOUCH_SCREEN_RED);
 }
-void Controller::allLightsBlue(int const &status)
+void Controller::allLightsBlue(int const &status, bool const &withLCDs)
 {
-    for (int i : XTOUCH_BLUE)
+    for (int i : XTOUCH_BTN_BLUE)
     {
         setLight(i, status);
     }
+    if (withLCDs)
+        setLCDColor(XTOUCH_CHANNELS, XTOUCH_SCREEN_BLUE);
 }
-void Controller::allLightsGreen(int const &status)
+void Controller::allLightsGreen(int const &status, bool const &withLCDs)
 {
-    for (int i : XTOUCH_GREEN)
+    for (int i : XTOUCH_BTN_GREEN)
     {
         setLight(i, status);
     }
+    if (withLCDs)
+        setLCDColor(XTOUCH_CHANNELS, XTOUCH_SCREEN_GREEN);
 }
-void Controller::allLightsYellow(int const &status)
+void Controller::allLightsYellow(int const &status, bool const &withLCDs)
 {
-    for (int i : XTOUCH_YELLOW)
+    for (int i : XTOUCH_BTN_YELLOW)
     {
         setLight(i, status);
     }
+    if (withLCDs)
+        setLCDColor(XTOUCH_CHANNELS, XTOUCH_SCREEN_YELLOW);
 }
 
 //  sound peaks
@@ -273,20 +284,63 @@ void Controller::setFader(std::vector<int> const &faders, std::vector<int> const
         std::cerr << "Error: faders & values do not have same sizes" << std::endl;
 }
 
-void Controller::setLCD()
+void Controller::updateLCDColorsMemory(int const &lcd, unsigned char const &color)
 {
-    // unsigned char msg[] = {0xF0, 0x00, 0x00, 0x66, 0x58, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7};
-    unsigned char oldSysexMessage[] = {
-        0xF0, 0x00, 0x00, 0x66, 0x58, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7};
-    unsigned char sysexOtherMessage[] = {
-        0xF0, 0x00, 0x00, 0x66, 0x14, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7};
-    unsigned char sysexMessage[] = {
-        0xF0, 0x00, 0x00, 0x66, 0x14, 0x72, 0x01, 0x11, 0x41, 0x51, 0x01, 0x01, 0x01, 0x01, 0xF7};
+    if (lcd < 1 || lcd > 8)
+    {
+        std::cerr << "LCDs go from 1 to 8" << std::endl;
+        return;
+    }
+    if (color < 0 || color > 7)
+    {
+        std::cerr << "Colors go from 0 to 7" << std::endl;
+        return;
+    }
+    xTouchColors[lcd - 1] = color;
+}
+
+void Controller::refreshLCDColors()
+{
+    unsigned char sysexMessage[] = {0xF0, 0x00, 0x00, 0x66, 0x14, 0x72, 0, 0, 0, 0, 0, 0, 0, 0, 0xF7};
+    for (unsigned char i = 0; i < 8; i++)
+    {
+        sysexMessage[i + 6] = xTouchColors[i];
+    }
+
     PmError error = Pm_WriteSysEx(_midiOutStream, 0, sysexMessage);
     if (error != pmNoError)
     {
         std::cerr << "Error sending SysEx message: " << Pm_GetErrorText(error) << std::endl;
     }
+}
+
+void Controller::setLCDColor(int const &lcd, unsigned char const &color)
+{
+    updateLCDColorsMemory(lcd, color);
+    refreshLCDColors();
+}
+
+void Controller::setLCDColor(std::vector<int> const &lcds, unsigned char const &color)
+{
+    for (unsigned char i = 0; i < lcds.size(); i++)
+    {
+        updateLCDColorsMemory(lcds[i], color);
+    }
+    refreshLCDColors();
+}
+
+void Controller::setLCDColor(std::vector<int> const &lcds, std::vector<unsigned char> const &colors)
+{
+    if (lcds.size() == colors.size())
+    {
+        for (unsigned char i = 0; i < lcds.size(); i++)
+        {
+            updateLCDColorsMemory(lcds[i], colors[i]);
+        }
+        refreshLCDColors();
+    }
+    else
+        std::cerr << "Error: lcds & colors do not have same sizes" << std::endl;
 }
 
 void Controller::manual(int const &ch, int const &bt, int const &val)

@@ -328,20 +328,22 @@ void Controller::animFilledUpperRightCross(int const &stepTime, bool const &reve
     }
 }
 
-void Controller::animColors(int const &stepTime)
+void Controller::animColors(int const &stepTime, bool const &withLCDs)
 {
-    allLightsRed(XTOUCH_STATUS_ON);
+    allLightsRed(XTOUCH_STATUS_ON, withLCDs);
     usleep(1000 * stepTime);
-    allLightsRed(XTOUCH_STATUS_OFF);
-    allLightsYellow(XTOUCH_STATUS_ON);
+    allLightsRed(XTOUCH_STATUS_OFF, withLCDs);
+    allLightsYellow(XTOUCH_STATUS_ON, withLCDs);
     usleep(1000 * stepTime);
-    allLightsYellow(XTOUCH_STATUS_OFF);
-    allLightsGreen(XTOUCH_STATUS_ON);
+    allLightsYellow(XTOUCH_STATUS_OFF, withLCDs);
+    allLightsGreen(XTOUCH_STATUS_ON, withLCDs);
     usleep(1000 * stepTime);
-    allLightsGreen(XTOUCH_STATUS_OFF);
-    allLightsBlue(XTOUCH_STATUS_ON);
+    allLightsGreen(XTOUCH_STATUS_OFF, withLCDs);
+    allLightsBlue(XTOUCH_STATUS_ON, withLCDs);
     usleep(1000 * stepTime);
-    allLightsBlue(XTOUCH_STATUS_OFF);
+    allLightsBlue(XTOUCH_STATUS_OFF, withLCDs);
+    if (withLCDs)
+        setLCDColor(XTOUCH_CHANNELS, XTOUCH_SCREEN_BLACK);
 }
 
 void demoLights(Controller &surface)
@@ -386,10 +388,11 @@ void initAnim(Controller &surface)
 {
     surface.setAllLights(XTOUCH_STATUS_OFF);
     surface.animUpperRightCross(50);
-    surface.setSoundPeak({1,2,3,4,5,6,7,8}, {14, 10, 6, 2, 2, 6, 10, 14});
+    surface.setSoundPeak(XTOUCH_CHANNELS, {14, 10, 6, 2, 2, 6, 10, 14});
     surface.animFilledFaders(50);
-    surface.setSoundPeak({1,2,3,4,5,6,7,8}, {2, 6, 10, 14, 14, 10, 6, 2});
+    surface.setSoundPeak(XTOUCH_CHANNELS, {2, 6, 10, 14, 14, 10, 6, 2});
     surface.animFilledColumns(25);
+    surface.animColors(75, true);
 }
 
 void Controller::animFaders(int const &stepTime, bool const &reverse)
@@ -412,7 +415,8 @@ void Controller::animFaders(int const &stepTime, bool const &reverse)
 
 void Controller::animFilledFaders(int const &stepTime, bool const &reverse)
 {
-    if (reverse) {
+    if (reverse)
+    {
         for (signed int i = XTOUCH_FADERS.size() - 1; i >= 0; i--)
         {
             setFader(XTOUCH_FADERS[i], XTOUCH_STATUS_ON);
@@ -424,7 +428,8 @@ void Controller::animFilledFaders(int const &stepTime, bool const &reverse)
             usleep(1000 * stepTime);
         }
     }
-    else {
+    else
+    {
         for (size_t i = 0; i < XTOUCH_FADERS.size(); i++)
         {
             setFader(XTOUCH_FADERS[i], XTOUCH_STATUS_ON);
@@ -436,4 +441,34 @@ void Controller::animFilledFaders(int const &stepTime, bool const &reverse)
             usleep(1000 * stepTime);
         }
     }
+}
+
+void Controller::animLCDRainbow(int const &stepTime, int const &numberOfLoops, bool const &reverse)
+{
+    if (reverse)
+        for (size_t i = 0; i < numberOfLoops || numberOfLoops < 0; i++)
+        {
+            setLCDColor(XTOUCH_CHANNELS, {XTOUCH_SCREEN_RAINBOW[(i) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 1) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 2) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 3) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 4) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 5) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 6) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 7) % XTOUCH_RAINBOW_SIZE]});
+            usleep(1000 * stepTime);
+        }
+    else
+        for (size_t i = numberOfLoops; i >= 0 || numberOfLoops < 0; i--)
+        {
+            setLCDColor(XTOUCH_CHANNELS, {XTOUCH_SCREEN_RAINBOW[(i) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 1) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 2) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 3) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 4) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 5) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 6) % XTOUCH_RAINBOW_SIZE],
+                                                   XTOUCH_SCREEN_RAINBOW[(i + 7) % XTOUCH_RAINBOW_SIZE]});
+            usleep(1000 * stepTime);
+        }
 }
