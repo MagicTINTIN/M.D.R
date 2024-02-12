@@ -6,6 +6,7 @@
 
 const int XTOUCH_BUTTONS_CH = 144;
 const int XTOUCH_ENCODERS_CH = 176;
+const int XTOUCH_SOUNDPEAKS_CH = 208;
 
 // values
 

@@ -1,7 +1,7 @@
 # M.D.R
 > Mixer, Dimmers & Router
 ---
-Software reroute sounds from applications to mixing table.
+Software to control computer with Behringer X-Touch. Will later be able to reroute sounds from applications to Behringer XR-18 mixer.
 
 > ⚠️ project is still in developpement, so it might not work ⚠️
 
