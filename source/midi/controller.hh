@@ -79,6 +79,7 @@ public:
     // other
     void manual(int const &ch, int const &bt, int const &val);
     void analyser(int const &chStart, int const &chEnd, int const &btStart, int const &btEnd, int const &valStart, int const &valEnd, int const &stepTime);
+    void advancedAnalyser(std::vector<unsigned char> const &values, bool const &addHeader = true);
 
 private:
     std::string _name;
@@ -87,6 +88,8 @@ private:
     PmStream *_midiInStream;
     PmStream *_midiOutStream;
     MidiEvent _midiEvent;
+    unsigned char xTouchColors[8] = {0};
+
     void processMidiInput();
     void processMidiEvents();
 };

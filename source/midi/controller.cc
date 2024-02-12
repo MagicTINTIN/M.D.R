@@ -106,7 +106,7 @@ void Controller::processMidiEvents()
     {
         std::unique_lock<std::mutex> lock(_midiEvent.mutex);
         _midiEvent.cv.wait(lock, [&]
-                          { return _midiEvent.startIdx != _midiEvent.endIdx; });
+                           { return _midiEvent.startIdx != _midiEvent.endIdx; });
 
         // Process MIDI events in the circular buffer
         while (_midiEvent.startIdx != _midiEvent.endIdx)
@@ -161,10 +161,10 @@ void Controller::setLight(std::vector<int> const &buttons, int const &value)
 void Controller::setLight(std::vector<int> const &buttons, std::vector<int> const &values)
 {
     if (buttons.size() == values.size())
-    for (size_t i = 0; i < buttons.size(); i++)
-    {
-        setLight(buttons[i], values[i]);
-    }
+        for (size_t i = 0; i < buttons.size(); i++)
+        {
+            setLight(buttons[i], values[i]);
+        }
 }
 
 void Controller::setAllLights(int const &status)
@@ -208,12 +208,14 @@ void Controller::allLightsYellow(int const &status)
 
 void Controller::setSoundPeak(int const &channel, int const &value)
 {
-    if (channel < 1 || channel > 8) {
+    if (channel < 1 || channel > 8)
+    {
         std::cerr << "Sound peak channels go from 1 to 8" << std::endl;
         return;
     }
-    if (value < 0 || value > 8) {
-        std::cerr << "Sound peak values go from 0 to 8" << std::endl;
+    if (value < 0 || value > 14)
+    {
+        std::cerr << "Sound peak values go from 0 to 14" << std::endl;
         return;
     }
     int sentValue = (16 * (channel - 1)) + value;
@@ -275,11 +277,11 @@ void Controller::setLCD()
 {
     // unsigned char msg[] = {0xF0, 0x00, 0x00, 0x66, 0x58, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7};
     unsigned char oldSysexMessage[] = {
-        0xF0, 0x00, 0x00, 0x66, 0x58, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7
-    };
+        0xF0, 0x00, 0x00, 0x66, 0x58, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7};
+    unsigned char sysexOtherMessage[] = {
+        0xF0, 0x00, 0x00, 0x66, 0x14, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7};
     unsigned char sysexMessage[] = {
-        0xF0, 0x00, 0x00, 0x66, 0x14, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7
-    };
+        0xF0, 0x00, 0x00, 0x66, 0x14, 0x72, 0x01, 0x11, 0x41, 0x51, 0x01, 0x01, 0x01, 0x01, 0xF7};
     PmError error = Pm_WriteSysEx(_midiOutStream, 0, sysexMessage);
     if (error != pmNoError)
     {
@@ -310,5 +312,25 @@ void Controller::analyser(int const &chStart, int const &chEnd, int const &btSta
                 usleep(1000 * stepTime);
             }
         }
+    }
+}
+
+void Controller::advancedAnalyser(std::vector<unsigned char> const &values, bool const &addHeader)
+{
+    std::vector<unsigned char> sysexVector = {};
+    if (addHeader)
+    {
+        sysexVector.emplace_back(XTOUCH_COM_START);
+        for (unsigned char v : XTOUCH_COM_HEADER)
+            sysexVector.emplace_back(v);
+    }
+    for (unsigned char v : values)
+        sysexVector.emplace_back(v);
+    if (addHeader)
+        sysexVector.emplace_back(XTOUCH_COM_END);
+    PmError error = Pm_WriteSysEx(_midiOutStream, 0, &sysexVector[0]);
+    if (error != pmNoError)
+    {
+        std::cerr << "Error sending SysEx message: " << Pm_GetErrorText(error) << std::endl;
     }
 }

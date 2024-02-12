@@ -2,6 +2,14 @@
 
 #include <vector>
 
+// sysex com
+
+const unsigned char XTOUCH_COM_START = 0xF0;
+const std::vector<unsigned char> XTOUCH_COM_HEADER = {0x00, 0x00, 0x66, 0x14};
+const unsigned char XTOUCH_COM_END = 0xF7;
+
+const unsigned char XTOUCH_COM_SCREEN_COLOR = 0x72;
+
 // group channels
 
 const int XTOUCH_BUTTONS_CH = 144;

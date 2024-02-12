@@ -29,9 +29,17 @@ int main()
     Controller surface(surfaceName, dInputId, dOutputId);
 
     surface.setFader(XTOUCH_FADERS, 0);
+    surface.setLCD();
     initAnim(surface);
     
-    surface.analyser(208, 208, 0, 127, 0, 0, 2);
+    //surface.analyser(208, 208, 0, 127, 0, 0, 2);
+    for (size_t i = 0; i < 128; i++)
+    {
+        usleep(100000);
+        unsigned char iuc = (unsigned char) i;
+        surface.advancedAnalyser({XTOUCH_COM_SCREEN_COLOR, iuc, iuc, iuc, iuc, iuc, iuc, iuc, iuc}, true);
+    }
+    
 
     surface.startInputThreads();
 
