@@ -77,7 +77,7 @@ private:
     PmDeviceID _deviceOut;
     PmStream *_midiInStream;
     PmStream *_midiOutStream;
-    MidiEvent midiEvent;
+    MidiEvent _midiEvent;
     void processMidiInput();
     void processMidiEvents();
 };

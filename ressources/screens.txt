@@ -1,0 +1,16 @@
+All these MIDI SysEx messages below are omitting the (required) starting F0 and ending F7
+The Example below sets Scribble strip 1 to become red, with the first line displaying a centred "Ch 1" with bright font on 
+dark background, and the second line displaying a manually right aligned "aB3" in dark font on bright background.
+
+MIDI SysEx Parts: Header | Channel (20 - 27) | Colour (01-07 and 41 - 47) | Content Line 1: 7 ASCII  bytes, 00 cause centreing | Content Line 2: 7 ASCII bytes, 20 works as non-breakable space
+Hex: 00 00 66 58 | 20 | 41 | 43 68 20 31 00 00 00 | 20 20 20 20 61 42 33
+ASCII: N/A | N/A | N/A | Ch1 | aB3
+
+unsigned char sysexMessage[] = {
+        0xF0, 0x00, 0x00, 0x66, 0x58, 0x20, 0x41, 0x43, 0x68, 0x20, 0x31, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x61, 0x42, 0x33, 0xF7
+};
+PmError error = Pm_WriteSysEx(_midiOutStream, 0, sysexMessage);
+if (error != pmNoError)
+{
+    std::cerr << "Error sending SysEx message: " << Pm_GetErrorText(error) << std::endl;
+}

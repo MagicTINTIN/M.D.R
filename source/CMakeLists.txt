@@ -9,10 +9,10 @@ add_executable(mdr
     main.cc
     midi/communication.cc
     midi/controller.cc
-    midi/animations.cc )
-
+    midi/animations.cc
 #    examplewindow.cc
 #    labeledoptionmenu.cc
+    )
 
 target_link_libraries(mdr 
     ${GTKMM_LIBRARIES} ${PORTMIDI_LIBRARIES} )

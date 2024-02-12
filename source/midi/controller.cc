@@ -82,20 +82,20 @@ void Controller::processMidiInput()
         }
 
         // store events to the circular buffer
-        std::unique_lock<std::mutex> lock(midiEvent.mutex);
+        std::unique_lock<std::mutex> lock(_midiEvent.mutex);
         for (int i = 0; i < numEvents; ++i)
         {
-            midiEvent.events[midiEvent.endIdx] = buffer[i];
-            midiEvent.endIdx = (midiEvent.endIdx + 1) % AUX_BUFFER_SIZE;
-            if (midiEvent.endIdx == midiEvent.startIdx)
+            _midiEvent.events[_midiEvent.endIdx] = buffer[i];
+            _midiEvent.endIdx = (_midiEvent.endIdx + 1) % AUX_BUFFER_SIZE;
+            if (_midiEvent.endIdx == _midiEvent.startIdx)
             {
                 std::cerr << "Circular buffer overflow. Some events may be lost." << std::endl;
-                midiEvent.startIdx = (midiEvent.startIdx + 1) % AUX_BUFFER_SIZE;
+                _midiEvent.startIdx = (_midiEvent.startIdx + 1) % AUX_BUFFER_SIZE;
             }
         }
         lock.unlock();
         // notify the event processing thread
-        midiEvent.cv.notify_one();
+        _midiEvent.cv.notify_one();
     }
 }
 
@@ -104,15 +104,15 @@ void Controller::processMidiEvents()
 {
     while (true)
     {
-        std::unique_lock<std::mutex> lock(midiEvent.mutex);
-        midiEvent.cv.wait(lock, [&]
-                          { return midiEvent.startIdx != midiEvent.endIdx; });
+        std::unique_lock<std::mutex> lock(_midiEvent.mutex);
+        _midiEvent.cv.wait(lock, [&]
+                          { return _midiEvent.startIdx != _midiEvent.endIdx; });
 
         // Process MIDI events in the circular buffer
-        while (midiEvent.startIdx != midiEvent.endIdx)
+        while (_midiEvent.startIdx != _midiEvent.endIdx)
         {
-            PmEvent event = midiEvent.events[midiEvent.startIdx];
-            midiEvent.startIdx = (midiEvent.startIdx + 1) % AUX_BUFFER_SIZE;
+            PmEvent event = _midiEvent.events[_midiEvent.startIdx];
+            _midiEvent.startIdx = (_midiEvent.startIdx + 1) % AUX_BUFFER_SIZE;
 
             // int messageType = Pm_MessageStatus(event.message);
             int channel = Pm_MessageStatus(event.message);
