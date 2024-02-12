@@ -37,15 +37,24 @@ public:
     // lights
     void setLight(int const &button, int const &value);
     void setLight(std::vector<int> const &buttons, int const &value);
+    void setLight(std::vector<int> const &buttons, std::vector<int> const &values);
+    
     void setAllLights(int const &status);
     void allLightsRed(int const &status);
     void allLightsBlue(int const &status);
     void allLightsGreen(int const &status);
     void allLightsYellow(int const &status);
 
+    // sound peaks
+
+    void setSoundPeak(int const &channel, int const &value);
+    void setSoundPeak(std::vector<int> const &channels, int const &value);
+    void setSoundPeak(std::vector<int> const &channels, std::vector<int> const &values);
+
     // faders
     void setFader(int const &fader, int const &value);
     void setFader(std::vector<int> const &faders, int const &value);
+    void setFader(std::vector<int> const &faders, std::vector<int> const &values);
 
     // lcd
     void setLCD();
