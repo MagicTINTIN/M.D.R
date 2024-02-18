@@ -343,6 +343,9 @@ void Controller::setLCDColor(std::vector<int> const &lcds, std::vector<unsigned 
         std::cerr << "Error: lcds & colors do not have same sizes" << std::endl;
 }
 
+// 176, 64-75, 0-127
+// 176, 48-55, 0-127
+
 void Controller::manual(int const &ch, int const &bt, int const &val)
 {
     PmEvent portmidiEvent;

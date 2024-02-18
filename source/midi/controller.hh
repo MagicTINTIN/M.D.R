@@ -61,6 +61,32 @@ public:
     void setLCDColor(std::vector<int> const &lcds, unsigned char const &color);
     void setLCDColor(std::vector<int> const &lcds, std::vector<unsigned char> const &colors);
 
+    // rings
+    void setRing(int const &ring, int const &type, int const &value);
+    void setRing(std::vector<int> const &rings, int const &type, int const &value);
+    void setRing(std::vector<int> const &rings, std::vector<int> const &types, std::vector<int> const &values);
+
+    // segments
+    void setSegments(int const &segment, int const &value);
+    void setSegments(std::vector<int> const &segments, int const &value);
+    void setSegments(std::vector<int> const &segments, std::vector<int> const &values);
+
+    void setSegments(int const &segment, char const &value);
+    void setSegments(std::vector<int> const &segments, char const &value);
+    void setSegments(std::vector<int> const &segments, std::vector<char> const &values);
+
+    void setAssignmentSegment(char const &value1, char const &value2);
+    void setAssignmentSegment(std::string const &value);
+    void setHoursSegment(char const &value1, char const &value2, char const &value3);
+    void setHoursSegment(std::string const &value);
+    void setMinutesSegment(char const &value1, char const &value2);
+    void setMinutesSegment(std::string const &value);
+    void setSecondsSegment(char const &value1, char const &value2);
+    void setSecondsSegment(std::string const &value);
+    void setFramesSegment(char const &value1, char const &value2, char const &value3);
+    void setFramesSegment(std::string const &value);
+    
+
     // animations
     void animRandom(int const &steps, int const &stepTime, bool const &blinking = false);
     void animChaser(int const &stepTime, bool const &reverse = false);
