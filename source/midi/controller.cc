@@ -134,13 +134,15 @@ void Controller::processMidiEvents()
     }
 }
 
-void Controller::startInputThreads()
+void Controller::startThreads()
 {
     std::thread inputThread(&Controller::processMidiInput, this);
     std::thread eventThread(&Controller::processMidiEvents, this);
+    std::thread dateTimeThread(&Controller::dateTimeThread, this);
 
     inputThread.join();
     eventThread.join();
+    dateTimeThread.join();
 }
 
 // COMMANDS HANDLERS

@@ -33,7 +33,7 @@ int main()
     //initAnim(surface);
     //surface.animLCDRainbow(150, 16, true);
 
-    surface.startInputThreads();
+    surface.startThreads();
 
     terminatePortMidi();
     std::cout << "Ending mdr\n";

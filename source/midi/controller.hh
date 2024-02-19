@@ -31,7 +31,7 @@ public:
 
     //----- in -----//
 
-    void startInputThreads();
+    void startThreads();
 
     //----- out -----//
 
@@ -108,6 +108,7 @@ public:
 
     // more functions
     void displayCurrentDateTime();
+    void dateTimeThread();
 
     // other
     void manual(int const &ch, int const &bt, int const &val);

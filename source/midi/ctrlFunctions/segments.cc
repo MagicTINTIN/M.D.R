@@ -46,7 +46,7 @@ void Controller::setSegmentsChar(int const &segment, char const &value, bool con
     if (!XTOUCH_SEGMENTS_CHARS.count(value))
         std::cerr << "Error: the char '" << value << "' is not available" << std::endl;
     else
-        setSegments(segment, XTOUCH_SEGMENTS_CHARS.at(value)+(point ? XTOUCH_SEGMENT_POINT_VARIANT : 0));
+        setSegments(segment, XTOUCH_SEGMENTS_CHARS.at(value) + (point ? XTOUCH_SEGMENT_POINT_VARIANT : 0));
 }
 
 void Controller::setSegmentsChar(std::vector<int> const &segments, char const &value, bool const &point)
@@ -54,7 +54,7 @@ void Controller::setSegmentsChar(std::vector<int> const &segments, char const &v
     if (!XTOUCH_SEGMENTS_CHARS.count(value))
         std::cerr << "Error: the char '" << value << "' is not available" << std::endl;
     else
-        setSegments(segments, XTOUCH_SEGMENTS_CHARS.at(value)+(point ? XTOUCH_SEGMENT_POINT_VARIANT : 0));
+        setSegments(segments, XTOUCH_SEGMENTS_CHARS.at(value) + (point ? XTOUCH_SEGMENT_POINT_VARIANT : 0));
 }
 
 void Controller::setSegmentsChar(std::vector<int> const &segments, std::vector<char> const &values)
@@ -63,39 +63,74 @@ void Controller::setSegmentsChar(std::vector<int> const &segments, std::vector<c
     for (size_t i = 0; i < values.size(); i++)
     {
         if (!XTOUCH_SEGMENTS_CHARS.count(values[i]))
-        std::cerr << "Error: the char '" << values[i] << "' is not available" << std::endl;
-    else
-        chars.emplace_back(XTOUCH_SEGMENTS_CHARS.at(values[i]));
+            std::cerr << "Error: the char '" << values[i] << "' is not available" << std::endl;
+        else
+            chars.emplace_back(XTOUCH_SEGMENTS_CHARS.at(values[i]));
     }
     setSegments(segments, chars);
 }
 
-void setAssignmentSegment(char const &value1, char const &value2)
-{}
+void Controller::setAssignmentSegment(char const &value1, char const &value2)
+{
+    setSegmentsChar({11, 10}, {value1, value2});
+}
 
-void setAssignmentSegment(std::string const &value)
-{}
+void Controller::setAssignmentSegment(std::string const &value)
+{
+    if (value.size() >= 2)
+        setSegmentsChar({11, 10}, {value.at(0), value.at(1)});
+    else
+        std::cerr << "Error: string must be of size 2 (or more)" << std::endl;
+}
 
-void setHoursSegment(char const &value1, char const &value2, char const &value3)
-{}
+void Controller::setHoursSegment(char const &value1, char const &value2, char const &value3)
+{
+    setSegmentsChar({9, 8, 7}, {value1, value2, value3});
+}
 
-void setHoursSegment(std::string const &value)
-{}
+void Controller::setHoursSegment(std::string const &value)
+{
+    if (value.size() >= 3)
+        setSegmentsChar({9,8,7}, {value.at(0), value.at(1), value.at(2)});
+    else
+        std::cerr << "Error: string must be of size 3 (or more)" << std::endl;
+}
 
-void setMinutesSegment(char const &value1, char const &value2)
-{}
+void Controller::setMinutesSegment(char const &value1, char const &value2)
+{
+    setSegmentsChar({6,5}, {value1, value2});
+}
 
-void setMinutesSegment(std::string const &value)
-{}
+void Controller::setMinutesSegment(std::string const &value)
+{
+    if (value.size() >= 2)
+        setSegmentsChar({6,5}, {value.at(0), value.at(1)});
+    else
+        std::cerr << "Error: string must be of size 2 (or more)" << std::endl;
+}
 
-void setSecondsSegment(char const &value1, char const &value2)
-{}
+void Controller::setSecondsSegment(char const &value1, char const &value2)
+{
+    setSegmentsChar({4,3}, {value1, value2});
+}
 
-void setSecondsSegment(std::string const &value)
-{}
+void Controller::setSecondsSegment(std::string const &value)
+{
+    if (value.size() >= 2)
+        setSegmentsChar({4,3}, {value.at(0), value.at(1)});
+    else
+        std::cerr << "Error: string must be of size 2 (or more)" << std::endl;
+}
 
-void setFramesSegment(char const &value1, char const &value2, char const &value3)
-{}
+void Controller::setFramesSegment(char const &value1, char const &value2, char const &value3)
+{
+    setSegmentsChar({2,1,0}, {value1, value2, value3});
+}
 
-void setFramesSegment(std::string const &value)
-{}
+void Controller::setFramesSegment(std::string const &value)
+{
+    if (value.size() >= 3)
+        setSegmentsChar({2,1,0}, {value.at(0), value.at(1), value.at(2)});
+    else
+        std::cerr << "Error: string must be of size 3 (or more)" << std::endl;
+}
