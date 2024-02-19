@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 // sysex com
 
@@ -27,6 +28,7 @@ const unsigned char XTOUCH_RAINBOW_SIZE = 6;
 
 const int XTOUCH_BUTTONS_CH = 144;
 const int XTOUCH_ENCODERS_CH = 176;
+const int XTOUCH_SEGMENTS_CH = 176;
 const int XTOUCH_SOUNDPEAKS_CH = 208;
 
 const std::vector<int> XTOUCH_CHANNELS = {1, 2, 3, 4, 5, 6, 7, 8};
@@ -306,8 +308,11 @@ const int XTOUCH_RING6 = 53;
 const int XTOUCH_RING7 = 54;
 const int XTOUCH_RING8 = 55;
 
-const std::vector<int> XTOUCH_RINGS = {
+const std::vector<int> XTOUCH_RINGS_ADDRESSES = {
     48, 49, 50, 51, 52, 53, 54, 55};
+
+const std::vector<int> XTOUCH_RINGS = {
+    1,2,3,4,5,6,7,8};
 
 const int XTOUCH_RING_MODE_NORMAL = 0;
 const int XTOUCH_RING_MODE_PAN = 16;
@@ -320,3 +325,62 @@ const int XTOUCH_RING_MODE_NORMAL_WEXT = XTOUCH_RING_MODE_NORMAL + XTOUCH_RING_M
 const int XTOUCH_RING_MODE_PAN_WEXT = XTOUCH_RING_MODE_PAN + XTOUCH_RING_MODE_EXTERIORS;
 const int XTOUCH_RING_MODE_FILLED_WEXT = XTOUCH_RING_MODE_FILLED + XTOUCH_RING_MODE_EXTERIORS;
 const int XTOUCH_RING_MODE_DISPERSION_WEXT = XTOUCH_RING_MODE_DISPERSION + XTOUCH_RING_MODE_EXTERIORS;
+
+// Segments
+
+const std::vector<int>  XTOUCH_SEGMENTS = {0,1,2,3,4,5,6,7,8,9,10,11};
+const std::vector<int>  XTOUCH_REVERSED_SEGMENTS = {11,10,9,8,7,6,5,4,3,2,1,0};
+const std::vector<int>  XTOUCH_SEGMENTS_ADDRESSES = {64,65,66,67,68,69,70,71,72,73,74,75};
+
+const int XTOUCH_FIRST_SEGMENT = 64;
+
+const int XTOUCH_SEGMENT_POINT_VARIANT = 64;
+
+typedef std::map<char, int> CharsAssociationSegments;
+const CharsAssociationSegments XTOUCH_SEGMENTS_CHARS={
+    {' ', 0},
+    {'A', 1}, {'a', 1},
+    {'B', 2}, {'b', 2},
+    {'C', 3}, {'c', 3},
+    {'D', 4}, {'d', 4},
+    {'E', 5}, {'e', 5},
+    {'F', 6}, {'f', 6},
+    {'G', 7}, {'g', 7},
+    {'H', 8}, {'h', 8},
+    {'I', 9}, {'i', 9},
+    {'J', 10}, {'j', 10},
+    {'K', 11}, {'k', 11},
+    {'L', 12}, {'l', 12},
+    {'M', 13}, {'m', 13},
+    {'N', 14}, {'n', 14},
+    {'O', 15}, {'o', 15},
+    {'P', 16}, {'p', 16},
+    {'Q', 17}, {'q', 17},
+    {'R', 18}, {'r', 18},
+    {'S', 19}, {'s', 19},
+    {'T', 20}, {'t', 20},
+    {'U', 21}, {'u', 21},
+    {'V', 22}, {'v', 22},
+    {'W', 23}, {'w', 23},
+    {'X', 24}, {'x', 24},
+    {'Y', 25}, {'y', 25},
+    {'Z', 26}, {'z', 26},
+    {'_', 31},
+    {'"', 34},
+    //{'°', 35},
+    {'`', 35},
+    {'\'', 39},
+    {',', 44},
+    {'-', 45},
+    {'0', 48},
+    {'1', 49},
+    {'2', 50},
+    {'3', 51},
+    {'4', 52},
+    {'5', 53},
+    {'6', 54},
+    {'7', 55},
+    {'8', 56},
+    {'9', 57},
+    {'+', 61}
+};

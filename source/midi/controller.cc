@@ -49,6 +49,8 @@ Controller::Controller(std::string name, PmDeviceID in, PmDeviceID out) : _name(
         std::cerr << "Error opening " << _name << " MIDI output: " << Pm_GetErrorText(errorOut) << std::endl;
     }
     refreshLCDColors();
+    setSegments(XTOUCH_REVERSED_SEGMENTS, 0);
+    setRing(XTOUCH_RINGS, 0, 0);
     setFader(XTOUCH_FADERS, 0);
     setAllLights(XTOUCH_STATUS_OFF);
 }
@@ -153,13 +155,13 @@ void Controller::buttonsHandler(int const &channel, int const &button, int const
     {
         _temp--;
         std::cout << "Temp value = " << _temp << std::endl;
-        setRing(1, 0, _temp);
+        setSegments(0, _temp);
     }
     else if (button == XTOUCH_RIGHT && _temp < 128)
     {
         _temp++;
         std::cout << "Temp value = " << _temp << std::endl;
-        setRing(1, 0, _temp);
+        setSegments(0, _temp);
     }
 }
 
@@ -396,7 +398,7 @@ void Controller::setRing(int const &ring, int const &mode, int const &value)
     }
 
     PmEvent portmidiEvent;
-    portmidiEvent.message = Pm_Message(XTOUCH_ENCODERS_CH, 47 + ring, mode+value);
+    portmidiEvent.message = Pm_Message(XTOUCH_ENCODERS_CH, XTOUCH_RING1 - 1 + ring, mode + value);
     portmidiEvent.timestamp = 0;
     Pm_Write(_midiOutStream, &portmidiEvent, 1);
 }
@@ -422,7 +424,69 @@ void Controller::setRing(std::vector<int> const &rings, std::vector<int> const &
         std::cerr << "Error: rings, modes & values do not have same sizes" << std::endl;
 }
 
-// 176, 64-75, 0-127
+void Controller::setSegments(int const &segment, int const &value)
+{
+    // 176, 64-75, 0-127
+    if (segment < 0 || segment > 11)
+    {
+        std::cerr << "Segments go from 0 to 11" << std::endl;
+        return;
+    }
+    PmEvent portmidiEvent;
+    portmidiEvent.message = Pm_Message(XTOUCH_SEGMENTS_CH, XTOUCH_FIRST_SEGMENT + segment, value);
+    portmidiEvent.timestamp = 0;
+    Pm_Write(_midiOutStream, &portmidiEvent, 1);
+}
+
+void Controller::setSegments(std::vector<int> const &segments, int const &value)
+{
+    for (unsigned char i = 0; i < segments.size(); i++)
+    {
+        setSegments(segments[i], value);
+    }
+}
+
+void Controller::setSegments(std::vector<int> const &segments, std::vector<int> const &values)
+{
+    if (segments.size() == values.size())
+    {
+        for (unsigned char i = 0; i < segments.size(); i++)
+        {
+            setSegments(segments[i], values[i]);
+        }
+    }
+    else
+        std::cerr << "Error: segments & values do not have same sizes" << std::endl;
+}
+
+void Controller::setSegmentsChar(int const &segment, char const &value, bool const &point)
+{
+    if (!XTOUCH_SEGMENTS_CHARS.count(value))
+        std::cerr << "Error: the char '" << value << "' is not available" << std::endl;
+    else
+        setSegments(segment, XTOUCH_SEGMENTS_CHARS.at(value)+(point ? XTOUCH_SEGMENT_POINT_VARIANT : 0));
+}
+
+void Controller::setSegmentsChar(std::vector<int> const &segments, char const &value, bool const &point)
+{
+    if (!XTOUCH_SEGMENTS_CHARS.count(value))
+        std::cerr << "Error: the char '" << value << "' is not available" << std::endl;
+    else
+        setSegments(segments, XTOUCH_SEGMENTS_CHARS.at(value)+(point ? XTOUCH_SEGMENT_POINT_VARIANT : 0));
+}
+
+void Controller::setSegmentsChar(std::vector<int> const &segments, std::vector<char> const &values)
+{
+    std::vector<int> chars;
+    for (size_t i = 0; i < values.size(); i++)
+    {
+        if (!XTOUCH_SEGMENTS_CHARS.count(values[i]))
+        std::cerr << "Error: the char '" << values[i] << "' is not available" << std::endl;
+    else
+        chars.emplace_back(XTOUCH_SEGMENTS_CHARS.at(values[i]));
+    }
+    setSegments(segments, chars);
+}
 
 void Controller::manual(int const &ch, int const &bt, int const &val)
 {

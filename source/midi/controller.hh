@@ -4,6 +4,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <map>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -71,9 +72,9 @@ public:
     void setSegments(std::vector<int> const &segments, int const &value);
     void setSegments(std::vector<int> const &segments, std::vector<int> const &values);
 
-    void setSegments(int const &segment, char const &value);
-    void setSegments(std::vector<int> const &segments, char const &value);
-    void setSegments(std::vector<int> const &segments, std::vector<char> const &values);
+    void setSegmentsChar(int const &segment, char const &value, bool const &point = false);
+    void setSegmentsChar(std::vector<int> const &segments, char const &value, bool const &point = false);
+    void setSegmentsChar(std::vector<int> const &segments, std::vector<char> const &values);
 
     void setAssignmentSegment(char const &value1, char const &value2);
     void setAssignmentSegment(std::string const &value);
