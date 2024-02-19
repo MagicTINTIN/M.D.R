@@ -38,7 +38,7 @@ public:
     void setLight(int const &button, int const &value);
     void setLight(std::vector<int> const &buttons, int const &value);
     void setLight(std::vector<int> const &buttons, std::vector<int> const &values);
-    
+
     void setAllLights(int const &status);
     void allLightsRed(int const &status, bool const &withLCDs = false);
     void allLightsBlue(int const &status, bool const &withLCDs = false);
@@ -62,9 +62,9 @@ public:
     void setLCDColor(std::vector<int> const &lcds, std::vector<unsigned char> const &colors);
 
     // rings
-    void setRing(int const &ring, int const &type, int const &value);
-    void setRing(std::vector<int> const &rings, int const &type, int const &value);
-    void setRing(std::vector<int> const &rings, std::vector<int> const &types, std::vector<int> const &values);
+    void setRing(int const &ring, int const &mode, int const &value);
+    void setRing(std::vector<int> const &rings, int const &mode, int const &value);
+    void setRing(std::vector<int> const &rings, std::vector<int> const &modes, std::vector<int> const &values);
 
     // segments
     void setSegments(int const &segment, int const &value);
@@ -85,7 +85,6 @@ public:
     void setSecondsSegment(std::string const &value);
     void setFramesSegment(char const &value1, char const &value2, char const &value3);
     void setFramesSegment(std::string const &value);
-    
 
     // animations
     void animRandom(int const &steps, int const &stepTime, bool const &blinking = false);
@@ -118,12 +117,15 @@ private:
     PmStream *_midiInStream;
     PmStream *_midiOutStream;
     MidiEvent _midiEvent;
-    unsigned char xTouchColors[8] = {0,0,0,0,0,0,0,0};
+    unsigned char _xTouchColors[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    int _temp = 0;
 
     void updateLCDColorsMemory(int const &lcd, unsigned char const &color);
     void refreshLCDColors();
     void processMidiInput();
     void processMidiEvents();
+    
+    void buttonsHandler(int const &channel, int const &button, int const &value);
 };
 
 bool findController(PmDeviceID &in, PmDeviceID &out, std::string const &name);

@@ -125,7 +125,7 @@ void Controller::processMidiEvents()
 
             if (channel == XTOUCH_BUTTONS_CH && button < XTOUCH_NB_OF_BUTTONS)
             {
-                setLight(button, value);
+                buttonsHandler(channel, button, value);
             }
         }
         lock.unlock();
@@ -139,6 +139,28 @@ void Controller::startInputThreads()
 
     inputThread.join();
     eventThread.join();
+}
+
+// COMMANDS HANDLERS
+
+void Controller::buttonsHandler(int const &channel, int const &button, int const &value)
+{
+    setLight(button, value);
+    if (value != XTOUCH_STATUS_ON)
+        return;
+
+    if (button == XTOUCH_LEFT && _temp > 0)
+    {
+        _temp--;
+        std::cout << "Temp value = " << _temp << std::endl;
+        setRing(1, 0, _temp);
+    }
+    else if (button == XTOUCH_RIGHT && _temp < 128)
+    {
+        _temp++;
+        std::cout << "Temp value = " << _temp << std::endl;
+        setRing(1, 0, _temp);
+    }
 }
 
 // OUTPUT FUNCTIONS
@@ -296,7 +318,7 @@ void Controller::updateLCDColorsMemory(int const &lcd, unsigned char const &colo
         std::cerr << "Colors go from 0 to 7" << std::endl;
         return;
     }
-    xTouchColors[lcd - 1] = color;
+    _xTouchColors[lcd - 1] = color;
 }
 
 void Controller::refreshLCDColors()
@@ -304,7 +326,7 @@ void Controller::refreshLCDColors()
     unsigned char sysexMessage[] = {0xF0, 0x00, 0x00, 0x66, 0x14, 0x72, 0, 0, 0, 0, 0, 0, 0, 0, 0xF7};
     for (unsigned char i = 0; i < 8; i++)
     {
-        sysexMessage[i + 6] = xTouchColors[i];
+        sysexMessage[i + 6] = _xTouchColors[i];
     }
 
     PmError error = Pm_WriteSysEx(_midiOutStream, 0, sysexMessage);
@@ -343,8 +365,64 @@ void Controller::setLCDColor(std::vector<int> const &lcds, std::vector<unsigned 
         std::cerr << "Error: lcds & colors do not have same sizes" << std::endl;
 }
 
+void Controller::setRing(int const &ring, int const &mode, int const &value)
+{
+    // 176, 48-55, 0-127
+    if (ring < 1 || ring > 8)
+    {
+        std::cerr << "Rings go from 1 to 8" << std::endl;
+        return;
+    }
+    if (mode < 0 || mode > 127 || mode % 16 != 0)
+    {
+        std::cerr << "Modes are multiples of 16 (see XTOUCH_RING_MODE_* in xtouch.hh)" << std::endl;
+        return;
+    }
+    if (mode == XTOUCH_RING_MODE_DISPERSION || XTOUCH_RING_MODE_DISPERSION_WEXT)
+    {
+        if (value < XTOUCH_RING_MIN_VALUE || value > XTOUCH_RING_MAX_VALUE_DISPERSION)
+        {
+            std::cerr << "Dispersion values go from 0 to 5" << std::endl;
+            return;
+        }
+    }
+    else
+    {
+        if (value < XTOUCH_RING_MIN_VALUE || value > XTOUCH_RING_MAX_VALUE_NORMAL)
+        {
+            std::cerr << "Ring values go from 0 to 10" << std::endl;
+            return;
+        }
+    }
+
+    PmEvent portmidiEvent;
+    portmidiEvent.message = Pm_Message(XTOUCH_ENCODERS_CH, 47 + ring, mode+value);
+    portmidiEvent.timestamp = 0;
+    Pm_Write(_midiOutStream, &portmidiEvent, 1);
+}
+
+void Controller::setRing(std::vector<int> const &rings, int const &mode, int const &value)
+{
+    for (unsigned char i = 0; i < rings.size(); i++)
+    {
+        setRing(rings[i], mode, value);
+    }
+}
+
+void Controller::setRing(std::vector<int> const &rings, std::vector<int> const &modes, std::vector<int> const &values)
+{
+    if (rings.size() == modes.size() && modes.size() == values.size())
+    {
+        for (unsigned char i = 0; i < rings.size(); i++)
+        {
+            setRing(rings[i], modes[i], values[i]);
+        }
+    }
+    else
+        std::cerr << "Error: rings, modes & values do not have same sizes" << std::endl;
+}
+
 // 176, 64-75, 0-127
-// 176, 48-55, 0-127
 
 void Controller::manual(int const &ch, int const &bt, int const &val)
 {

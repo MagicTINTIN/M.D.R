@@ -28,9 +28,9 @@ int main()
     }
     Controller surface(surfaceName, dInputId, dOutputId);
 
-    surface.analyser(176, 176, 48, 55, 0, 255, 20);
-    initAnim(surface);
-    surface.animLCDRainbow(150, 16, true);
+    //surface.analyser(176, 176, 48, 55, 0, 255, 20);
+    //initAnim(surface);
+    //surface.animLCDRainbow(150, 16, true);
 
     surface.startInputThreads();
 
