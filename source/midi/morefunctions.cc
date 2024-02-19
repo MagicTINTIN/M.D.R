@@ -1,5 +1,3 @@
-#pragma once
-
 #include <iostream>
 #include <cstring>
 #include <string>
@@ -8,6 +6,7 @@
 #include "communication.hh"
 #include "controller.hh"
 #include "xtouch.hh"
+#include "../global/utils.hh"
 
-void demoLights(Controller &surface);
-void initAnim(Controller &surface);
+void Controller::displayCurrentDateTime() {
+}

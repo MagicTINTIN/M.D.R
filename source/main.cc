@@ -28,7 +28,7 @@ int main()
     }
     Controller surface(surfaceName, dInputId, dOutputId);
 
-    surface.setSegmentsChar({6,5,4,3,2,1,0}, {'b','o', 'n', 'j', 'o', 'u', 'r'});
+    surface.setSegmentsChar({9,8,7,6,5,4,3}, {'b','o', 'n', 'j', 'o', 'u', 'r'});
     //surface.analyser(176, 176, 48, 55, 0, 255, 20);
     //initAnim(surface);
     //surface.animLCDRainbow(150, 16, true);

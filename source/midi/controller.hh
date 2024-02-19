@@ -106,6 +106,9 @@ public:
 
     void animLCDRainbow(int const &stepTime, int const &numberOfLoops, bool const &reverse = false);
 
+    // more functions
+    void displayCurrentDateTime();
+
     // other
     void manual(int const &ch, int const &bt, int const &val);
     void analyser(int const &chStart, int const &chEnd, int const &btStart, int const &btEnd, int const &valStart, int const &valEnd, int const &stepTime);

@@ -7,9 +7,19 @@ include_directories(
 
 add_executable(mdr
     main.cc
+    global/utils.cc
     midi/communication.cc
     midi/controller.cc
+    
     midi/animations.cc
+    midi/morefunctions.cc
+
+    midi/ctrlFunctions/buttons.cc
+    midi/ctrlFunctions/faders.cc
+    midi/ctrlFunctions/lcds.cc
+    midi/ctrlFunctions/rings.cc
+    midi/ctrlFunctions/segments.cc
+    midi/ctrlFunctions/soundpeaks.cc
 #    examplewindow.cc
 #    labeledoptionmenu.cc
     )
