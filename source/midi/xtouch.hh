@@ -384,3 +384,6 @@ const CharsAssociationSegments XTOUCH_SEGMENTS_CHARS={
     {'9', 57},
     {'+', 61}
 };
+
+// lcd
+int const MAX_CHARS_PER_LCD = 7;

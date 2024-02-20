@@ -165,6 +165,17 @@ void Controller::buttonsHandler(int const &channel, int const &button, int const
         std::cout << "Temp value = " << _temp << std::endl;
         setSegments(0, _temp);
     }
+    else if (button == XTOUCH_SCRUB)
+    {
+        _toggletemp = (_toggletemp + 1) % 2;
+        if (_toggletemp) {
+            std::cout << "Toggle = " << _toggletemp << std::endl;
+            reset();
+        }
+        else {
+            std::cout << "Toggle = " << _toggletemp << std::endl;
+        }
+    }
 }
 
 // OUTPUT FUNCTIONS
@@ -213,4 +224,29 @@ void Controller::advancedAnalyser(std::vector<unsigned char> const &values, bool
     {
         std::cerr << "Error sending SysEx message: " << Pm_GetErrorText(error) << std::endl;
     }
+}
+
+// to be confirmed
+void Controller::toggleBacklight(bool const &on)
+{
+    if (on) {
+            std::cout << "Toggle backlight = " << on << std::endl;
+            advancedAnalyser({0xa, 0x1});
+        }
+        else {
+            std::cout << "Toggle backlight = " << on << std::endl;
+            advancedAnalyser({0xa, 0x0});
+        }
+}
+
+void Controller::recalibrateFaders()
+{
+    std::cout << "Recalibrating faders..." << std::endl;
+    advancedAnalyser({0x09, 0x00});
+}
+
+void Controller::reset()
+{
+    std::cout << "Resetting controler..." << std::endl;
+    advancedAnalyser({0x08, 0x00});
 }

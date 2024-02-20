@@ -8,3 +8,5 @@
 std::string getCurrentHour();
 std::string getCurrentMinute();
 std::string getCurrentSecond();
+
+std::string replaceNonAsciiWithAscii(const std::string &input);

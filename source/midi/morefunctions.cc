@@ -23,5 +23,4 @@ void Controller::dateTimeThread()
         displayCurrentDateTime();
         usleep(1000000);
     }
-    
 }

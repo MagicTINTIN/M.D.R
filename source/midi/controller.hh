@@ -29,11 +29,7 @@ public:
     Controller(std::string name, PmDeviceID in, PmDeviceID out);
     ~Controller();
 
-    //----- in -----//
-
     void startThreads();
-
-    //----- out -----//
 
     // lights
     void setLight(int const &button, int const &value);
@@ -110,6 +106,11 @@ public:
     void displayCurrentDateTime();
     void dateTimeThread();
 
+    // to be confirmed
+    void toggleBacklight(bool const &on);
+    void recalibrateFaders();
+    void reset();
+
     // other
     void manual(int const &ch, int const &bt, int const &val);
     void analyser(int const &chStart, int const &chEnd, int const &btStart, int const &btEnd, int const &valStart, int const &valEnd, int const &stepTime);
@@ -124,6 +125,7 @@ private:
     MidiEvent _midiEvent;
     unsigned char _xTouchColors[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     int _temp = 0;
+    int _toggletemp = 0;
 
     void updateLCDColorsMemory(int const &lcd, unsigned char const &color);
     void refreshLCDColors();
