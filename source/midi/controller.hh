@@ -58,6 +58,12 @@ public:
     void setLCDColor(std::vector<int> const &lcds, unsigned char const &color);
     void setLCDColor(std::vector<int> const &lcds, std::vector<unsigned char> const &colors);
 
+    void setLCDText(int const &lcd, int const &line, std::string const &text, int const &alignment = 0);
+    void setLCDText(std::vector<int> const &lcds, std::vector<int> const &lines, std::string const &text, int const &alignment = 0);
+    void setLCDText(std::vector<int> const &lcds, std::vector<int> const &lines, std::vector<std::string> const &texts, int const &alignment = 0);
+    
+    void setLCDFullLineText(int const &line, std::string const &text, int const &alignment = 0);
+
     // rings
     void setRing(int const &ring, int const &mode, int const &value);
     void setRing(std::vector<int> const &rings, int const &mode, int const &value);
@@ -114,7 +120,7 @@ public:
     // other
     void manual(int const &ch, int const &bt, int const &val);
     void analyser(int const &chStart, int const &chEnd, int const &btStart, int const &btEnd, int const &valStart, int const &valEnd, int const &stepTime);
-    void advancedAnalyser(std::vector<unsigned char> const &values, bool const &addHeader = true);
+    void advancedAnalyser(std::vector<unsigned char> const &values, int const &addHeader = 1);
 
 private:
     std::string _name;

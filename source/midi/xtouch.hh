@@ -7,6 +7,7 @@
 
 const unsigned char XTOUCH_COM_START = 0xF0;
 const std::vector<unsigned char> XTOUCH_COM_HEADER = {0x00, 0x00, 0x66, 0x14};
+const std::vector<unsigned char> XTOUCH_COM_ARDOUR_HEADER = {0x00, 0x00, 0x67, 0x15};
 const unsigned char XTOUCH_COM_END = 0xF7;
 
 // sysex screen values
@@ -41,6 +42,7 @@ const int XTOUCH_STATUS_ON = 127;
 
 // buttons
 const int XTOUCH_NB_OF_BUTTONS = 102;
+int const XTOUCH_NB_OF_CHANNELS = 8;
 
 // channels buttons
 const int XTOUCH_REC1 = 0;
@@ -386,4 +388,5 @@ const CharsAssociationSegments XTOUCH_SEGMENTS_CHARS={
 };
 
 // lcd
-int const MAX_CHARS_PER_LCD = 7;
+int const XTOUCH_MAX_CHARS_PER_LCD = 7;
+int const XTOUCH_MAX_CHARS_PER_FULL_LINE = XTOUCH_NB_OF_CHANNELS * XTOUCH_MAX_CHARS_PER_LCD;

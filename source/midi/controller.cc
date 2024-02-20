@@ -53,6 +53,8 @@ Controller::Controller(std::string name, PmDeviceID in, PmDeviceID out) : _name(
     setRing(XTOUCH_RINGS, 0, 0);
     setFader(XTOUCH_FADERS, 0);
     setAllLights(XTOUCH_STATUS_OFF);
+    setLCDFullLineText(0,"");
+    setLCDFullLineText(1,"");
 }
 
 Controller::~Controller()
@@ -165,15 +167,20 @@ void Controller::buttonsHandler(int const &channel, int const &button, int const
         std::cout << "Temp value = " << _temp << std::endl;
         setSegments(0, _temp);
     }
+    else if (button == XTOUCH_REC)
+        reset();
     else if (button == XTOUCH_SCRUB)
     {
         _toggletemp = (_toggletemp + 1) % 2;
-        if (_toggletemp) {
+        if (_toggletemp)
+        {
             std::cout << "Toggle = " << _toggletemp << std::endl;
-            reset();
+            toggleBacklight(true);
         }
-        else {
+        else
+        {
             std::cout << "Toggle = " << _toggletemp << std::endl;
+            toggleBacklight(false);
         }
     }
 }
@@ -206,18 +213,22 @@ void Controller::analyser(int const &chStart, int const &chEnd, int const &btSta
     }
 }
 
-void Controller::advancedAnalyser(std::vector<unsigned char> const &values, bool const &addHeader)
+void Controller::advancedAnalyser(std::vector<unsigned char> const &values, int const &addHeader)
 {
     std::vector<unsigned char> sysexVector = {};
-    if (addHeader)
+    if (addHeader > 0)
     {
         sysexVector.emplace_back(XTOUCH_COM_START);
-        for (unsigned char v : XTOUCH_COM_HEADER)
-            sysexVector.emplace_back(v);
+        if (addHeader == 2)
+            for (unsigned char v : XTOUCH_COM_HEADER)
+                sysexVector.emplace_back(v);
+        if (addHeader == 3)
+            for (unsigned char v : XTOUCH_COM_ARDOUR_HEADER)
+                sysexVector.emplace_back(v);
     }
     for (unsigned char v : values)
         sysexVector.emplace_back(v);
-    if (addHeader)
+    if (addHeader > 0)
         sysexVector.emplace_back(XTOUCH_COM_END);
     PmError error = Pm_WriteSysEx(_midiOutStream, 0, &sysexVector[0]);
     if (error != pmNoError)
@@ -229,14 +240,16 @@ void Controller::advancedAnalyser(std::vector<unsigned char> const &values, bool
 // to be confirmed
 void Controller::toggleBacklight(bool const &on)
 {
-    if (on) {
-            std::cout << "Toggle backlight = " << on << std::endl;
-            advancedAnalyser({0xa, 0x1});
-        }
-        else {
-            std::cout << "Toggle backlight = " << on << std::endl;
-            advancedAnalyser({0xa, 0x0});
-        }
+    if (on)
+    {
+        std::cout << "Toggle backlight = " << on << std::endl;
+        advancedAnalyser({0xa, 0x1});
+    }
+    else
+    {
+        std::cout << "Toggle backlight = " << on << std::endl;
+        advancedAnalyser({0xa, 0x0});
+    }
 }
 
 void Controller::recalibrateFaders()

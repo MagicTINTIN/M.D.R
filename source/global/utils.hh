@@ -10,3 +10,4 @@ std::string getCurrentMinute();
 std::string getCurrentSecond();
 
 std::string replaceNonAsciiWithAscii(const std::string &input);
+std::string convertToPrintable(const std::string &input, const int &maxLength, const int &alignment = -1);

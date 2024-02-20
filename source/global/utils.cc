@@ -85,7 +85,7 @@ std::string replaceNonAsciiWithAscii(const std::string &input)
 
 std::string convertToPrintable(const std::string &input, const int &maxLength, const int &alignment = -1)
 {
-    if (alignment != -1 || alignment != 0 || alignment != 1)
+    if (alignment != -1 && alignment != 0 && alignment != 1)
     {
         std::cerr << "Error alignment has to be -1 (left), 0 (center) or 1 (right). Taking left as default." << std::endl;
     }

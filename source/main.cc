@@ -32,6 +32,11 @@ int main()
     //surface.analyser(176, 176, 48, 55, 0, 255, 20);
     //initAnim(surface);
     surface.animLCDRainbow(100, 8, true);
+    surface.setLCDColor(XTOUCH_CHANNELS, XTOUCH_SCREEN_YELLOW);
+    surface.setLCDText(1, 0, "Nice !");
+    surface.setLCDFullLineText(1,"C'est marrant !");
+    surface.setLCDText(7, 1, "Coucou");
+    surface.setLCDText(8, 0, "Yo!", 1);
 
     surface.startThreads();
 
