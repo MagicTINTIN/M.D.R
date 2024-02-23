@@ -139,6 +139,7 @@ private:
     void processMidiEvents();
     
     void buttonsHandler(int const &channel, int const &button, int const &value);
+    void fadersHandler(int const &channel, int const &button, int const &value);
 };
 
 bool findController(PmDeviceID &in, PmDeviceID &out, std::string const &name);

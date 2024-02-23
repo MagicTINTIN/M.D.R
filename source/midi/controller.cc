@@ -1,6 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <atomic>
+#include <algorithm>
 #include <cstring>
 #include <string>
 #include <unistd.h>
@@ -8,6 +9,7 @@
 #include "controller.hh"
 #include "communication.hh"
 #include "xtouch.hh"
+#include "../global/utils.hh"
 
 bool findController(PmDeviceID &in, PmDeviceID &out, std::string const &name)
 {
@@ -131,6 +133,10 @@ void Controller::processMidiEvents()
             {
                 buttonsHandler(channel, button, value);
             }
+            else if (std::find(XTOUCH_FADERS.begin(), XTOUCH_FADERS.end(), channel) != XTOUCH_FADERS.end())
+            {
+                fadersHandler(channel, button, value);
+            }
         }
         lock.unlock();
     }
@@ -183,6 +189,18 @@ void Controller::buttonsHandler(int const &channel, int const &button, int const
             toggleBacklight(false);
         }
     }
+}
+
+void Controller::fadersHandler(int const &channel, int const &button, int const &value)
+{
+    //std::vector<int>::iterator it = std::find(XTOUCH_FADERS.begin(), XTOUCH_FADERS.end(), channel);
+    //int index = std::distance(XTOUCH_FADERS.begin(), it) + 1;
+    if (std::find(XTOUCH_FADERS.begin(), XTOUCH_FADERS.end(), channel) == XTOUCH_FADERS.end()) return;
+    setFader(channel, value);
+    std::string strval = convertToPrintable(std::to_string(value*100/127), 3, 1);
+    std::cout << "'"<< strval << "'\n";
+    
+    setFramesSegment(strval);
 }
 
 // OUTPUT FUNCTIONS
