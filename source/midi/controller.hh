@@ -23,6 +23,17 @@ struct MidiEvent
     MidiEvent() : startIdx(0), endIdx(0) {}
 };
 
+const int TRIGGER_BUTTON_TYPE = 0;
+const int TRIGGER_FADER_TYPE = 1;
+
+struct typeTriggerUpdatePointer
+{
+    int type;
+    int triggeredBy;
+    int* value;
+};
+
+
 class Controller
 {
 public:
@@ -30,6 +41,7 @@ public:
     ~Controller();
 
     void startThreads();
+    void addValueToUpdate(typeTriggerUpdatePointer newVal);
 
     // lights
     void setLight(int const &button, int const &value);
@@ -90,8 +102,10 @@ public:
     void setFramesSegment(std::string const &value);
 
     // animations
-    void Controller::animVector(std::vector<int> &vec, int const &stepTime, bool const &reverse);
-    void Controller::animFilledVector(std::vector<int> &vec, int const &stepTime, bool const &reverse);
+    void animRandomOfVector(std::vector<int> const &vec, int const &steps, int const &stepTime, bool const &blinking);
+    void animTimeFunctionVector(std::vector<int> const &vec, int (*stepTime)(), bool const &reverse);
+    void animVector(std::vector<int> const &vec, int const &stepTime, bool const &reverse);
+    void animFilledVector(std::vector<int> const &vec, int const &stepTime, bool const &reverse);
     void animRandom(int const &steps, int const &stepTime, bool const &blinking = false);
     void animChaser(int const &stepTime, bool const &reverse = false);
     void animFilledChaser(int const &stepTime, bool const &reverse = false);
@@ -134,6 +148,8 @@ private:
     unsigned char _xTouchColors[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     int _temp = 0;
     int _toggletemp = 0;
+
+    std::vector<typeTriggerUpdatePointer> pointersToUpdateOnTrigger;
 
     void updateLCDColorsMemory(int const &lcd, unsigned char const &color);
     void refreshLCDColors();

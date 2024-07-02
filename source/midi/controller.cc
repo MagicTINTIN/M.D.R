@@ -65,6 +65,12 @@ Controller::~Controller()
     Pm_Close(_midiOutStream);
 }
 
+// add values to update
+
+void Controller::addValueToUpdate(typeTriggerUpdatePointer newVal) {
+    pointersToUpdateOnTrigger.emplace_back(newVal);
+}
+
 // INPUT FUNCTIONS
 
 // Process incoming MIDI events
@@ -158,37 +164,44 @@ void Controller::startThreads()
 void Controller::buttonsHandler(int const &channel, int const &button, int const &value)
 {
     setLight(button, value);
+    for (typeTriggerUpdatePointer evt : pointersToUpdateOnTrigger)
+    {
+        if (evt.type == TRIGGER_BUTTON_TYPE && evt.triggeredBy == button)
+            *(evt.value) = value;
+    }
+    
     if (value != XTOUCH_STATUS_ON)
         return;
 
-    if (button == XTOUCH_LEFT && _temp > 0)
-    {
-        _temp--;
-        std::cout << "Temp value = " << _temp << std::endl;
-        setSegments(0, _temp);
-    }
-    else if (button == XTOUCH_RIGHT && _temp < 128)
-    {
-        _temp++;
-        std::cout << "Temp value = " << _temp << std::endl;
-        setSegments(0, _temp);
-    }
-    else if (button == XTOUCH_REC)
-        reset();
-    else if (button == XTOUCH_SCRUB)
-    {
-        _toggletemp = (_toggletemp + 1) % 2;
-        if (_toggletemp)
-        {
-            std::cout << "Toggle = " << _toggletemp << std::endl;
-            toggleBacklight(true);
-        }
-        else
-        {
-            std::cout << "Toggle = " << _toggletemp << std::endl;
-            toggleBacklight(false);
-        }
-    }
+    // DEBUG STUFF
+    // if (button == XTOUCH_LEFT && _temp > 0)
+    // {
+    //     _temp--;
+    //     std::cout << "Temp value = " << _temp << std::endl;
+    //     setSegments(0, _temp);
+    // }
+    // else if (button == XTOUCH_RIGHT && _temp < 128)
+    // {
+    //     _temp++;
+    //     std::cout << "Temp value = " << _temp << std::endl;
+    //     setSegments(0, _temp);
+    // }
+    // else if (button == XTOUCH_REC)
+    //     reset();
+    // else if (button == XTOUCH_SCRUB)
+    // {
+    //     _toggletemp = (_toggletemp + 1) % 2;
+    //     if (_toggletemp)
+    //     {
+    //         std::cout << "Toggle = " << _toggletemp << std::endl;
+    //         toggleBacklight(true);
+    //     }
+    //     else
+    //     {
+    //         std::cout << "Toggle = " << _toggletemp << std::endl;
+    //         toggleBacklight(false);
+    //     }
+    // }
 }
 
 void Controller::fadersHandler(int const &channel, int const &button, int const &value)
@@ -198,9 +211,15 @@ void Controller::fadersHandler(int const &channel, int const &button, int const 
     if (std::find(XTOUCH_FADERS.begin(), XTOUCH_FADERS.end(), channel) == XTOUCH_FADERS.end()) return;
     setFader(channel, value);
     std::string strval = convertToPrintable(std::to_string(value*100/127), 3, 1);
-    std::cout << "'"<< strval << "'\n";
+    //std::cout << "'"<< strval << "'\n";
     
     setFramesSegment(strval);
+
+    for (typeTriggerUpdatePointer evt : pointersToUpdateOnTrigger)
+    {
+        if (evt.type == TRIGGER_FADER_TYPE && evt.triggeredBy == channel)
+            *(evt.value) = value;
+    }
 }
 
 // OUTPUT FUNCTIONS
