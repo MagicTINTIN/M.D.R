@@ -26,22 +26,29 @@ struct MidiEvent
 const int TRIGGER_BUTTON_TYPE = 0;
 const int TRIGGER_FADER_TYPE = 1;
 
-struct typeTriggerUpdatePointer
-{
-    int type;
-    int triggeredBy;
-    int* value;
-};
-
-
 class Controller
 {
 public:
     Controller(std::string name, PmDeviceID in, PmDeviceID out);
     ~Controller();
 
+    struct typeTriggerUpdatePointer
+    {
+        int type;
+        int triggeredBy;
+        int *value;
+    };
+
+    struct typeTriggerFunction
+    {
+        int type;
+        int triggeredBy;
+        int (*fct)(Controller *, int);
+    };
+
     void startThreads();
     void addValueToUpdate(typeTriggerUpdatePointer newVal);
+    void addFunctionToTrigger(typeTriggerFunction newFunc);
 
     // lights
     void setLight(int const &button, int const &value);
@@ -73,7 +80,7 @@ public:
     void setLCDText(int const &lcd, int const &line, std::string const &text, int const &alignment = 0);
     void setLCDText(std::vector<int> const &lcds, std::vector<int> const &lines, std::string const &text, int const &alignment = 0);
     void setLCDText(std::vector<int> const &lcds, std::vector<int> const &lines, std::vector<std::string> const &texts, int const &alignment = 0);
-    
+
     void setLCDFullLineText(int const &line, std::string const &text, int const &alignment = 0);
 
     // rings
@@ -150,12 +157,13 @@ private:
     int _toggletemp = 0;
 
     std::vector<typeTriggerUpdatePointer> pointersToUpdateOnTrigger;
+    std::vector<typeTriggerFunction> fctsOnTrigger;
 
     void updateLCDColorsMemory(int const &lcd, unsigned char const &color);
     void refreshLCDColors();
     void processMidiInput();
     void processMidiEvents();
-    
+
     void buttonsHandler(int const &channel, int const &button, int const &value);
     void fadersHandler(int const &channel, int const &button, int const &value);
 };

@@ -71,6 +71,10 @@ void Controller::addValueToUpdate(typeTriggerUpdatePointer newVal) {
     pointersToUpdateOnTrigger.emplace_back(newVal);
 }
 
+void Controller::addFunctionToTrigger(typeTriggerFunction newFunc) {
+    fctsOnTrigger.emplace_back(newFunc);
+}
+
 // INPUT FUNCTIONS
 
 // Process incoming MIDI events
@@ -169,6 +173,11 @@ void Controller::buttonsHandler(int const &channel, int const &button, int const
         if (evt.type == TRIGGER_BUTTON_TYPE && evt.triggeredBy == button)
             *(evt.value) = value;
     }
+    for (typeTriggerFunction evt : fctsOnTrigger)
+    {
+        if (evt.type == TRIGGER_BUTTON_TYPE && evt.triggeredBy == button)
+            evt.fct(this, value);
+    }
     
     if (value != XTOUCH_STATUS_ON)
         return;
@@ -219,6 +228,11 @@ void Controller::fadersHandler(int const &channel, int const &button, int const 
     {
         if (evt.type == TRIGGER_FADER_TYPE && evt.triggeredBy == channel)
             *(evt.value) = value;
+    }
+    for (typeTriggerFunction evt : fctsOnTrigger)
+    {
+        if (evt.type == TRIGGER_FADER_TYPE && evt.triggeredBy == channel)
+            evt.fct(this, value);
     }
 }
 
