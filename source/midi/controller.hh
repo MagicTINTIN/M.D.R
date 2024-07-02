@@ -90,6 +90,8 @@ public:
     void setFramesSegment(std::string const &value);
 
     // animations
+    void Controller::animVector(std::vector<int> &vec, int const &stepTime, bool const &reverse);
+    void Controller::animFilledVector(std::vector<int> &vec, int const &stepTime, bool const &reverse);
     void animRandom(int const &steps, int const &stepTime, bool const &blinking = false);
     void animChaser(int const &stepTime, bool const &reverse = false);
     void animFilledChaser(int const &stepTime, bool const &reverse = false);

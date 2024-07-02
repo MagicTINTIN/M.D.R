@@ -38,6 +38,54 @@ void Controller::animRandom(int const &steps, int const &stepTime, bool const &b
         }
 }
 
+void Controller::animVector(std::vector<int> &vec, int const &stepTime, bool const &reverse)
+{
+    if (reverse)
+        for (signed int i = vec.size() - 1; i >= 0; i--)
+        {
+            setLight(vec[i], XTOUCH_STATUS_ON);
+            usleep(1000 * stepTime);
+            setLight(vec[i], XTOUCH_STATUS_OFF);
+        }
+    else
+        for (size_t i = 0; i < vec.size(); i++)
+        {
+            setLight(vec[i], XTOUCH_STATUS_ON);
+            usleep(1000 * stepTime);
+            setLight(vec[i], XTOUCH_STATUS_OFF);
+        }
+}
+
+void Controller::animFilledVector(std::vector<int> &vec, int const &stepTime, bool const &reverse)
+{
+    if (reverse)
+    {
+        for (signed int i = vec.size() - 1; i >= 0; i--)
+        {
+            setLight(vec[i], XTOUCH_STATUS_ON);
+            usleep(1000 * stepTime);
+        }
+        for (signed int i = vec.size() - 1; i >= 0; i--)
+        {
+            setLight(vec[i], XTOUCH_STATUS_OFF);
+            usleep(1000 * stepTime);
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < vec.size(); i++)
+        {
+            setLight(vec[i], XTOUCH_STATUS_ON);
+            usleep(1000 * stepTime);
+        }
+        for (size_t i = 0; i < vec.size(); i++)
+        {
+            setLight(vec[i], XTOUCH_STATUS_OFF);
+            usleep(1000 * stepTime);
+        }
+    }
+}
+
 void Controller::animChaser(int const &stepTime, bool const &reverse)
 {
     if (reverse)
