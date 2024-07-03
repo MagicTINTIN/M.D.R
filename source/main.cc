@@ -103,14 +103,7 @@ int modesChanger(Controller *surface, int val) {
     for (auto& thread : globalActiveThreads) {
         pthread_cancel(thread.native_handle());
     }
-
-    // Joindre les threads (ils sont déjà terminés)
-    // for (auto& thread : globalActiveThreads) {
-    //     if (thread.joinable()) {
-    //         thread.join();
-    //     }
-    // }
-    surface->reset();
+    surface->globalReset();
     std::cout << "=> MODE : " << globalMode << std::endl;
 
     if (globalMode == 0) {
@@ -157,7 +150,9 @@ int main()
     surface.addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_1_CH, &updateOtherFaders});
     surface.addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SCRUB, &modesChanger});
 
-    surface.setSegmentsChar({9, 8, 7, 6, 5, 4, 3}, {'b', 'o', 'n', 'j', 'o', 'u', 'r'});
+    surface.globalReset();
+
+    // surface.setSegmentsChar({9, 8, 7, 6, 5, 4, 3}, {'b', 'o', 'n', 'j', 'o', 'u', 'r'});
     // surface.analyser(176, 176, 48, 55, 0, 255, 20);
     // initAnim(surface);
     // surface.animLCDRainbow(100, 8, true);

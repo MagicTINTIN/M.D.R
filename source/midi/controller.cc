@@ -55,8 +55,8 @@ Controller::Controller(std::string name, PmDeviceID in, PmDeviceID out) : _name(
     setRing(XTOUCH_RINGS, 0, 0);
     setFader(XTOUCH_FADERS, 0);
     setAllLights(XTOUCH_STATUS_OFF);
-    setLCDFullLineText(0,"");
-    setLCDFullLineText(1,"");
+    setLCDFullLineText(0, "");
+    setLCDFullLineText(1, "");
 }
 
 Controller::~Controller()
@@ -67,11 +67,13 @@ Controller::~Controller()
 
 // add values to update
 
-void Controller::addValueToUpdate(typeTriggerUpdatePointer newVal) {
+void Controller::addValueToUpdate(typeTriggerUpdatePointer newVal)
+{
     pointersToUpdateOnTrigger.emplace_back(newVal);
 }
 
-void Controller::addFunctionToTrigger(typeTriggerFunction newFunc) {
+void Controller::addFunctionToTrigger(typeTriggerFunction newFunc)
+{
     fctsOnTrigger.emplace_back(newFunc);
 }
 
@@ -178,7 +180,7 @@ void Controller::buttonsHandler(int const &channel, int const &button, int const
         if (evt.type == TRIGGER_BUTTON_TYPE && evt.triggeredBy == button)
             evt.fct(this, value);
     }
-    
+
     if (value != XTOUCH_STATUS_ON)
         return;
 
@@ -215,13 +217,14 @@ void Controller::buttonsHandler(int const &channel, int const &button, int const
 
 void Controller::fadersHandler(int const &channel, int const &button, int const &value)
 {
-    //std::vector<int>::iterator it = std::find(XTOUCH_FADERS.begin(), XTOUCH_FADERS.end(), channel);
-    //int index = std::distance(XTOUCH_FADERS.begin(), it) + 1;
-    if (std::find(XTOUCH_FADERS.begin(), XTOUCH_FADERS.end(), channel) == XTOUCH_FADERS.end()) return;
+    // std::vector<int>::iterator it = std::find(XTOUCH_FADERS.begin(), XTOUCH_FADERS.end(), channel);
+    // int index = std::distance(XTOUCH_FADERS.begin(), it) + 1;
+    if (std::find(XTOUCH_FADERS.begin(), XTOUCH_FADERS.end(), channel) == XTOUCH_FADERS.end())
+        return;
     setFader(channel, value);
-    std::string strval = convertToPrintable(std::to_string(value*100/127), 3, 1);
-    //std::cout << "'"<< strval << "'\n";
-    
+    std::string strval = convertToPrintable(std::to_string(value * 100 / 127), 3, 1);
+    // std::cout << "'"<< strval << "'\n";
+
     setFramesSegment(strval);
 
     for (typeTriggerUpdatePointer evt : pointersToUpdateOnTrigger)
@@ -313,4 +316,53 @@ void Controller::resetSurface()
 {
     std::cout << "Resetting controler..." << std::endl;
     advancedAnalyser({0x08, 0x00});
+}
+
+// resetters
+
+void Controller::resetLights()
+{
+    setAllLights(XTOUCH_STATUS_OFF);
+}
+
+void Controller::resetFaders()
+{
+    setFader(XTOUCH_FADERS, XTOUCH_STATUS_OFF);
+}
+
+void Controller::resetSoundPeaks()
+{
+    setSoundPeak(XTOUCH_CHANNELS, XTOUCH_STATUS_OFF);
+}
+
+void Controller::resetLCDColors()
+{
+    setLCDColor(XTOUCH_CHANNELS, XTOUCH_SCREEN_BLACK);
+}
+
+void Controller::resetLCDTexts()
+{
+    setLCDFullLineText(0, " ");
+    setLCDFullLineText(1, " ");
+}
+
+void Controller::resetSegments()
+{
+    setSegmentsChar(XTOUCH_SEGMENTS, ' ');
+}
+
+void Controller::resetRings()
+{
+    setRing(XTOUCH_RINGS, XTOUCH_RING_MODE_NORMAL, 0);
+}
+
+void Controller::globalReset()
+{
+    resetLights();
+    resetFaders();
+    resetSoundPeaks();
+    resetLCDColors();
+    resetLCDTexts();
+    resetSegments();
+    resetRings();
 }

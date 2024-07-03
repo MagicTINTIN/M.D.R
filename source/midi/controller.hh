@@ -51,6 +51,14 @@ public:
     void addFunctionToTrigger(typeTriggerFunction newFunc);
 
     // resetters
+    void resetLights();
+    void resetFaders();
+    void resetSoundPeaks();
+    void resetLCDColors();
+    void resetLCDTexts();
+    void resetSegments();
+    void resetRings();
+    void globalReset();
 
     // lights
     void setLight(int const &button, int const &value);
