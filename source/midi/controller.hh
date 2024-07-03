@@ -50,6 +50,8 @@ public:
     void addValueToUpdate(typeTriggerUpdatePointer newVal);
     void addFunctionToTrigger(typeTriggerFunction newFunc);
 
+    // resetters
+
     // lights
     void setLight(int const &button, int const &value);
     void setLight(std::vector<int> const &buttons, int const &value);
@@ -138,7 +140,7 @@ public:
     // to be confirmed
     void toggleBacklight(bool const &on);
     void recalibrateFaders();
-    void reset();
+    void resetSurface();
 
     // other
     void manual(int const &ch, int const &bt, int const &val);

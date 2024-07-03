@@ -3,14 +3,23 @@
 #include <string>
 #include <cmath>
 #include <thread>
+#include <chrono>
+#include <csignal>
+#include <vector>
+#include <stop_token>
 #include <unistd.h>
+#include <pthread.h>
 #include "portmidi.h"
 #include "midi/communication.hh"
 #include "midi/controller.hh"
 #include "midi/xtouch.hh"
 #include "midi/animations.hh"
 
+#define NUMBER_OF_MODES 2
+int globalMode = NUMBER_OF_MODES - 1;
 int globalSpeed = 127;
+std::vector<std::thread> globalActiveThreads = {};
+
 
 int mapRange(int x, int inMin, int inMax, int outMin, int outMax)
 {
@@ -85,6 +94,44 @@ void randomAnim(Controller *surface)
     surface->animRandomOfVector({70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90}, -1, 500, 0);
 }
 
+int modesChanger(Controller *surface, int val) {
+    if (val == 0) return 0;
+
+    globalMode++;
+    globalMode%=NUMBER_OF_MODES;
+    std::cout << "cleaning threads...\n";
+    for (auto& thread : globalActiveThreads) {
+        pthread_cancel(thread.native_handle());
+    }
+
+    // Joindre les threads (ils sont déjà terminés)
+    // for (auto& thread : globalActiveThreads) {
+    //     if (thread.joinable()) {
+    //         thread.join();
+    //     }
+    // }
+    surface->reset();
+    std::cout << "=> MODE : " << globalMode << std::endl;
+
+    if (globalMode == 0) {
+        surface->setLCDFullLineText(0, "Commandes moteurs principaux");
+        surface->setLCDColor({1, 8}, XTOUCH_SCREEN_YELLOW);
+        surface->setLCDColor({3, 4, 5, 6}, XTOUCH_SCREEN_WHITE);
+        surface->setFader({XTOUCH_FADER_2_CH, XTOUCH_FADER_3_CH, XTOUCH_FADER_4_CH, XTOUCH_FADER_5_CH, XTOUCH_FADER_6_CH, XTOUCH_FADER_7_CH}, 0);
+        surface->setFader(XTOUCH_FADER_1_CH, 127);
+        surface->setFader(XTOUCH_FADER_8_CH, 69);
+
+        globalActiveThreads.emplace_back(yellowLineAnim, surface);
+        globalActiveThreads.emplace_back(randomAnim, surface);
+    }
+    else if (globalMode == 1) {
+        surface->setLCDFullLineText(0, "ALERTE");
+
+        surface->setLCDColor({1, 3, 5, 7}, XTOUCH_SCREEN_RED);
+    }
+    return 0;
+}
+
 int main()
 {
     std::cout << "Starting mdr\n";
@@ -108,6 +155,7 @@ int main()
     // adding values to be updated
     surface.addValueToUpdate({TRIGGER_FADER_TYPE, XTOUCH_FADER_1_CH, &globalSpeed});
     surface.addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_1_CH, &updateOtherFaders});
+    surface.addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SCRUB, &modesChanger});
 
     surface.setSegmentsChar({9, 8, 7, 6, 5, 4, 3}, {'b', 'o', 'n', 'j', 'o', 'u', 'r'});
     // surface.analyser(176, 176, 48, 55, 0, 255, 20);
@@ -118,15 +166,7 @@ int main()
     // surface.setLCDFullLineText(1,"C'est marrant !");
     // surface.setLCDText(7, 1, "Coucou");
     // surface.setLCDText(8, 0, "Yo!", 1);
-    surface.setLCDFullLineText(0, "Commandes moteurs principaux");
-    surface.setLCDColor({1, 8}, XTOUCH_SCREEN_YELLOW);
-    surface.setLCDColor({3, 4, 5, 6}, XTOUCH_SCREEN_WHITE);
-    surface.setFader({XTOUCH_FADER_2_CH, XTOUCH_FADER_3_CH, XTOUCH_FADER_4_CH, XTOUCH_FADER_5_CH, XTOUCH_FADER_6_CH, XTOUCH_FADER_7_CH}, 0);
-    surface.setFader(XTOUCH_FADER_1_CH, 127);
-    surface.setFader(XTOUCH_FADER_8_CH, 69);
-
-    std::thread ylAnimThread(yellowLineAnim, &surface);
-    std::thread rndAnimThread(randomAnim, &surface);
+    
 
     surface.startThreads();
 

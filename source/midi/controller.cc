@@ -309,7 +309,7 @@ void Controller::recalibrateFaders()
     advancedAnalyser({0x09, 0x00});
 }
 
-void Controller::reset()
+void Controller::resetSurface()
 {
     std::cout << "Resetting controler..." << std::endl;
     advancedAnalyser({0x08, 0x00});
