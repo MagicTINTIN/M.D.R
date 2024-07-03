@@ -50,6 +50,9 @@ public:
     void addValueToUpdate(typeTriggerUpdatePointer newVal);
     void addFunctionToTrigger(typeTriggerFunction newFunc);
 
+    void resetValuesToUpdate();
+    void resetFunctionsToTrigger();
+
     // resetters
     void resetLights();
     void resetFaders();

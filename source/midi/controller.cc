@@ -77,6 +77,17 @@ void Controller::addFunctionToTrigger(typeTriggerFunction newFunc)
     fctsOnTrigger.emplace_back(newFunc);
 }
 
+void Controller::resetValuesToUpdate()
+{
+    pointersToUpdateOnTrigger.clear();
+}
+
+void Controller::resetFunctionsToTrigger()
+{
+    fctsOnTrigger.clear();
+}
+
+
 // INPUT FUNCTIONS
 
 // Process incoming MIDI events
