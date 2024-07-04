@@ -15,10 +15,12 @@
 #include "midi/controller.hh"
 #include "midi/xtouch.hh"
 #include "midi/animations.hh"
+#include "dmx/usbPro.hh"
 
 #define NUMBER_OF_MODES 4
 int globalMode = NUMBER_OF_MODES - 1;
 int globalSpeed = 127;
+int switchLightsVar = 1;
 std::vector<std::thread> globalActiveThreads = {};
 unsigned char myDmx[530];
 
@@ -43,6 +45,76 @@ int getAnimSpeed()
     // return 1000 / (globalSpeed+1);
     // return 2000 / (std::pow(2 * globalSpeed, -2));
     return 500 / (log(2, 1 + std::pow(globalSpeed / 2, 4) / 100) + 1);
+}
+
+int switchLights(Controller *s, int val)
+{
+    // myDmx[1] = val == 127 ? 255 : 0;
+    if (val == 0)
+        return 0;
+    switchLightsVar++;
+    switchLightsVar %= 2;
+    if (switchLightsVar == 1)
+        return 0;
+    memset(myDmx, 0, 530);
+    return 0;
+}
+
+void resetDMX()
+{
+    memset(myDmx, 0, 530);
+}
+
+void startLight(int light, int value)
+{
+    if ((switchLightsVar == 0 && value > 0) || light < 1 || light > 512 || value < 0 || value > 255)
+        return;
+    myDmx[light] = value;
+}
+
+void finTransitionSoleil(int timeSpeed)
+{
+    for (int i = 0; i < 256; i++)
+    {
+        startLight(1, 255-i);
+        usleep(timeSpeed * 10);
+    }
+}
+
+void transitionSoleil(int timeSpeed)
+{
+    for (int i = 0; i < 256; i++)
+    {
+        startLight(2, i);
+        usleep(timeSpeed * 10);
+    }
+    for (int i = 0; i < 256; i++)
+    {
+        startLight(2, 255-i);
+        startLight(1, i);
+        usleep(timeSpeed * 10);
+    }
+
+    if (globalSpeed > 0)
+        finTransitionSoleil(timeSpeed);
+}
+
+void soleilFluctuant()
+{
+    while (true)
+    {
+        usleep(80000);
+        startLight(1, 170 + std::rand() % 10);
+    }
+}
+
+void soleilFort()
+{
+    while (true)
+    {
+        usleep(40000);
+        startLight(1, 200 + std::rand() % 55);
+    }
 }
 
 int updateOtherFaders(Controller *s, int val)
@@ -74,11 +146,16 @@ int updateOtherFaders(Controller *s, int val)
 
 void yellowLineAnim(Controller *surface)
 {
+    int i = 0;
     int previousValue = -1;
     while (1)
     {
-        if (globalSpeed > 0)
+        if (globalSpeed > 0) {
+            // //if (i % 100)
+            // transitionSoleil(getAnimSpeed());
             surface->animTimeFunctionVector(XTOUCH_ROWS[2], &getAnimSpeed, 0);
+            transitionSoleil(getAnimSpeed());
+        }
         else
             usleep(10000);
 
@@ -86,7 +163,9 @@ void yellowLineAnim(Controller *surface)
         {
             previousValue = globalSpeed;
             surface->setLight(XTOUCH_DOWN, (globalSpeed > 2) ? 127 : 0);
+            //startLight(1, (globalSpeed > 0) ? 0 : 255);
         }
+        i++;
     }
 }
 
@@ -120,6 +199,7 @@ void redAlarm(Controller *surface)
             surface->setLCDColor({1, 3, 5, 7}, XTOUCH_SCREEN_RED);
 
             rndPeriod = 20 + std::rand() % 100;
+            startLight(7,255);
         }
         if (timer % period == period / 4)
         {
@@ -129,6 +209,8 @@ void redAlarm(Controller *surface)
         {
             surface->setLCDColor({1, 3, 5, 7}, XTOUCH_SCREEN_BLACK);
             surface->setLCDColor({2, 4, 6, 8}, XTOUCH_SCREEN_RED);
+
+            startLight(7,0);
         }
         if (timer % period == 3 * period / 4)
         {
@@ -137,12 +219,13 @@ void redAlarm(Controller *surface)
         if (timer % 9 == 0)
         {
             surface->setLight({61, 69, 83, 90}, XTOUCH_STATUS_ON);
-            if (timer % 120 < 40) {
-                surface->setLight({8,11,12,15}, XTOUCH_STATUS_ON);
+            if (timer % 120 < 40)
+            {
+                surface->setLight({8, 11, 12, 15}, XTOUCH_STATUS_ON);
             }
         }
         if (timer % 9 == 4)
-            surface->setLight({61, 69, 83, 90, 8,11,12,15}, XTOUCH_STATUS_OFF);
+            surface->setLight({61, 69, 83, 90, 8, 11, 12, 15}, XTOUCH_STATUS_OFF);
 
         if (timer % 600 == 0)
         {
@@ -161,7 +244,8 @@ void redAlarm(Controller *surface)
         {
             dispersion = 5;
         }
-        if (timer % 4 == 0) dispersion--;
+        if (timer % 4 == 0)
+            dispersion--;
         for (size_t i = 0; i < 8; i++)
         {
             faders[i + 1] = faders[i];
@@ -203,12 +287,13 @@ void greenChaser(Controller *surface)
     {
         usleep(2000000);
         surface->animFilledVector(XTOUCH_BTN_GREEN, 60, 0);
-        surface->setLight({0,7}, {127,127});
+        surface->setLight({0, 7}, {127, 127});
         usleep(100000);
-        surface->setLight({0,7}, {0,0});
+        surface->setLight({0, 7}, {0, 0});
     }
-    
 }
+
+
 
 int modesChanger(Controller *surface, int val)
 {
@@ -225,8 +310,10 @@ int modesChanger(Controller *surface, int val)
     surface->resetFunctionsToTrigger();
     surface->resetValuesToUpdate();
     surface->globalReset();
+    resetDMX();
     std::cout << "=> MODE : " << globalMode << std::endl;
     surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SCRUB, &modesChanger});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_INST, &switchLights});
 
     if (globalMode == 0)
     {
@@ -242,20 +329,23 @@ int modesChanger(Controller *surface, int val)
         globalActiveThreads.emplace_back(yellowLineAnim, surface);
         globalActiveThreads.emplace_back(randomAnim, surface);
     }
-    else if (globalMode == 1) {
+    else if (globalMode == 1)
+    {
         surface->setLCDColor({1, 8}, XTOUCH_SCREEN_GREEN);
         surface->setLCDColor({4, 5}, XTOUCH_SCREEN_BLUE);
         surface->setLight(XTOUCH_ZOOM, XTOUCH_STATUS_BLINK);
-        surface->setFader(XTOUCH_FADERS, {90,74,65,60,55,60,65,74,90});
+        surface->setFader(XTOUCH_FADERS, {90, 74, 65, 60, 55, 60, 65, 74, 90});
         globalActiveThreads.emplace_back(greenChaser, surface);
+        globalActiveThreads.emplace_back(soleilFluctuant);
     }
     else if (globalMode == 2)
     {
         surface->setLCDText({1, 3, 5, 7}, {0, 0, 0, 0}, "ALERT!");
         surface->setLCDText({2, 4, 6, 8}, {0, 0, 0, 0}, "DANGER");
         globalActiveThreads.emplace_back(redAlarm, surface);
+        globalActiveThreads.emplace_back(soleilFort);
     }
-    
+
     return 0;
 }
 
@@ -263,6 +353,9 @@ int main()
 {
     std::cout << "Starting mdr\n";
     std::string surfaceName = "X-Touch X-TOUCH_INT";
+
+    memset(myDmx, 0, 530);
+    std::thread DMXUpdate(&startDMX, myDmx);
 
     if (initializePortMidi() != pmNoError)
     {

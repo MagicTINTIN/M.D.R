@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include "usbPro.hh"
 
 // old school globals
 DMXUSBPROParamsType PRO_Params;
@@ -347,7 +348,7 @@ void startDMX(unsigned char *myDmx)
 	*/
 	// Just to make sure the Device is correct
 	printf("\n Press Enter to Intialize Device :");
-	std::cin.get();
+	// std::cin.get();
 	Num_Devices = FTDI_ListDevices();
 	// Number of Found Devices
 	if (Num_Devices == 0)
@@ -412,12 +413,12 @@ void startDMX(unsigned char *myDmx)
 			// unsigned char myDmx[530];
 			// Looping to Send DMX data
 			printf("\n Press Enter to Send DMX data :");
-			std::cin.get();
-			for (int i = 0; i < 10000 ; i++)
+			//std::cin.get();
+			while (1) //int i = 0; i < 10000 ; i++
 			{
-				memset(myDmx,0,530);
-				myDmx[0] = 0;
-				myDmx[1] = 255;
+				// memset(myDmx,0,530);
+				// myDmx[0] = 0;
+				// myDmx[1] = 255;
 				res = FTDI_SendData(6, myDmx, 255);
 				if (res < 0)
 				{
@@ -426,36 +427,19 @@ void startDMX(unsigned char *myDmx)
 					break;
 					return;
 				}
-				printf("Iteration: %d\n", i);
-				printf("DMX Data from 0 to 10: ");
-				for (int j = 0; j <= 8; j++)
-					printf (" %d ",myDmx[j]);
-
-			}
-			for (int i = 0; i < 10000 ; i++)
-			{
-				memset(myDmx,i,530);
-				myDmx[0] = 0;
-				res = FTDI_SendData(6, myDmx, 255);
-				if (res < 0)
-				{
-					printf("FAILED\n");
-					FTDI_ClosePort();
-					break;
-					return;
-				}
-				printf("Iteration: %d\n", i);
-				printf("DMX Data from 0 to 10: ");
-				for (int j = 0; j <= 8; j++)
-					printf (" %d ",myDmx[j]);
-
+				// printf("Iteration: %d\n", i);
+				// printf("DMX Data from 0 to 10: ");
+				// for (int j = 0; j <= 8; j++)
+				// 	printf (" %d ",myDmx[j]);
+				// printf("\n");
+				usleep(20000);
 			}
 		}
 	}
 
 	// Finish all done
 	printf("\n Press Enter to Exit :");
-	std::cin.get();
+	//std::cin.get();
 
 	return;
 }
