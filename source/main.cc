@@ -20,6 +20,7 @@
 int globalMode = NUMBER_OF_MODES - 1;
 int globalSpeed = 127;
 std::vector<std::thread> globalActiveThreads = {};
+unsigned char myDmx[530];
 
 int mapRange(int x, int inMin, int inMax, int outMin, int outMax)
 {

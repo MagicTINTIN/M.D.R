@@ -20,14 +20,22 @@ add_executable(mdr
     midi/ctrlFunctions/rings.cc
     midi/ctrlFunctions/segments.cc
     midi/ctrlFunctions/soundpeaks.cc
+
+    dmx/stdafx.cpp
+    dmx/usbPro.cpp
 #    examplewindow.cc
 #    labeledoptionmenu.cc
     )
 
+    # Include directories
+include_directories(/usr/local/include)
+
 target_link_libraries(mdr 
-    ${GTKMM_LIBRARIES} ${PORTMIDI_LIBRARIES} )
+    ${GTKMM_LIBRARIES} ${PORTMIDI_LIBRARIES} /usr/local/lib/libftd2xx.so pthread)
     
 target_include_directories(mdr PRIVATE ${PORTMIDI_INCLUDE_DIRS})
+
+
 
 set_target_properties( mdr
     PROPERTIES
