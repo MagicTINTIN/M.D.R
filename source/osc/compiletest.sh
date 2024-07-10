@@ -1,0 +1,1 @@
+g++ -o xr18_control test.cc -llo
