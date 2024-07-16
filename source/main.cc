@@ -17,12 +17,16 @@
 #include "midi/animations.hh"
 #include "dmx/usbPro.hh"
 
-#define NUMBER_OF_MODES 6
+#define NUMBER_OF_MODES 3
 int globalMode = NUMBER_OF_MODES - 1;
 int globalSpeed = 127;
 int switchLightsVar = 1;
+int switchLedLightsVar = 1;
 std::vector<std::thread> globalActiveThreads = {};
 unsigned char myDmx[530];
+
+int lyreSpots[3] = {100, 113, 126};
+int ledAddresses[4] = {7, 11, 17, 23};
 
 int mapRange(int x, int inMin, int inMax, int outMin, int outMax)
 {
@@ -39,12 +43,13 @@ double log(double base, double x)
     return std::log(x) / std::log(base);
 }
 
-int getAnimSpeed()
+void dateTimeThread(Controller *s)
 {
-    // return 2000 / std::log2(std::pow(globalSpeed,10)+1)+1;
-    // return 1000 / (globalSpeed+1);
-    // return 2000 / (std::pow(2 * globalSpeed, -2));
-    return 800 / (log(2, 1 + std::pow(globalSpeed / 2, 4) / 100) + 1);
+    while (true)
+    {
+        s->displayCurrentDateTime();
+        usleep(1000000);
+    }
 }
 
 int switchLights(Controller *s, int val)
@@ -74,7 +79,7 @@ void startLight(int light, int value)
 
 void startLight(int light, int value, int timespeed)
 {
-    startLight(light, 2.8 * value / log(7,timespeed));
+    startLight(light, 2.8 * value / log(7, timespeed));
 }
 
 void startLight(std::vector<int> lights, int value)
@@ -85,302 +90,203 @@ void startLight(std::vector<int> lights, int value)
     }
 }
 
-void finTransitionSoleil(int timeSpeed)
+
+int switchLedLights(Controller *s, int val)
 {
-    for (int i = 0; i < 256; i++)
+    switchLedLightsVar++;
+    switchLedLightsVar%=2;
+    for (int i = 0; i < 4; i++)
     {
-        startLight(1, 255 - i, timeSpeed);
-        startLight(3, i, timeSpeed);
-        usleep(timeSpeed * 5);
+        // printf("meh\n");
+        startLight(ledAddresses[i] + (globalMode == 0 ? 0 : 2), switchLedLightsVar == 1 ? 255 : 0);
     }
-    for (int i = 0; i < 256; i++)
-    {
-        startLight(3, 255 - i, timeSpeed);
-        usleep(timeSpeed * 5);
-    }
-    usleep(timeSpeed * 200);
-}
-
-void transitionSoleil(int timeSpeed)
-{
-    usleep(timeSpeed * 200);
-    for (int i = 0; i < 256; i++)
-    {
-        startLight(2, i, timeSpeed);
-        usleep(timeSpeed * 6);
-    }
-
-    if (globalSpeed > 0)
-    {
-        for (int i = 0; i < 256; i++)
-        {
-            startLight(2, 255 - i, timeSpeed);
-            startLight(1, i, timeSpeed);
-            usleep(timeSpeed * 6);
-        }
-
-        finTransitionSoleil(timeSpeed);
-    }
-    else
-    {
-        for (int i = 0; i < 256; i++)
-        {
-            startLight(2, 255 - i, timeSpeed);
-            startLight(1, i/2, timeSpeed);
-            usleep(timeSpeed * 6);
-        }
-    }
-}
-
-void soleilFluctuant()
-{
-    while (true)
-    {
-        usleep(80000);
-        startLight(1, 100 + std::rand() % 10);
-    }
-}
-
-void soleilFort()
-{
-    while (true)
-    {
-        usleep(40000);
-        startLight(1, 200 + std::rand() % 55);
-    }
-}
-
-int updateOtherFaders(Controller *s, int val)
-{
-    // s->setSoundPeak(XTOUCH_CHANNELS, {mapRange(val, 127, 0, 8, 0),
-    //                                   mapRange(val, 127, 0, 6, 0),
-    //                                   mapRange(val, 127, 0, 4, 0),
-    //                                   mapRange(val, 127, 0, 2, 0),
-    //                                   mapRange(val, 127, 0, 2, 0),
-    //                                   mapRange(val, 127, 0, 4, 0),
-    //                                   mapRange(val, 127, 0, 6, 0),
-    //                                   mapRange(val, 127, 0, 8, 0)});
-    s->setFader({XTOUCH_FADER_2_CH,
-                 XTOUCH_FADER_3_CH,
-                 XTOUCH_FADER_4_CH,
-                 XTOUCH_FADER_5_CH,
-                 XTOUCH_FADER_6_CH,
-                 XTOUCH_FADER_7_CH},
-                {
-                    mapRange(val, 127, 0, 0, 4),
-                    mapRange(val, 127, 0, 0, 26),
-                    mapRange(val, 127, 0, 0, 64),
-                    mapRange(val, 127, 0, 0, 101),
-                    mapRange(val, 127, 0, 0, 123),
-                    mapRange(val, 127, 0, 0, 127),
-                });
     return 0;
 }
 
-void yellowLineAnim(Controller *surface)
+int halogen(Controller *surface, int val)
 {
-    int i = 0;
-    int previousValue = -1;
-    while (1)
+    startLight(1, val);
+    startLight(2, val);
+    return 0;
+}
+
+int focusMH(Controller *surface, int val)
+{
+    startLight(lyreSpots[0] + 9, val);
+    startLight(lyreSpots[1] + 9, val);
+    startLight(lyreSpots[2] + 9, val);
+    return 0;
+}
+
+int colorMH(Controller *surface, int val)
+{
+    startLight(lyreSpots[0] + 0, val);
+    startLight(lyreSpots[1] + 0, val);
+    startLight(lyreSpots[2] + 0, val);
+    return 0;
+}
+
+int offJardinMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[0] + 3, 0);
+        return 0;
+}
+
+int offCenterMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[1] + 3, 0);
+        return 0;
+}
+
+int offCourMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[2] + 3, 0);
+        return 0;
+}
+
+int midLowJardinMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[0] + 3, 42);
+        return 0;
+}
+
+int midLowCenterMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[1] + 3, 42);
+        return 0;
+}
+
+int midLowCourMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[2] + 3, 42);
+        return 0;
+}
+
+int midHighJardinMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[0] + 3, 84);
+        return 0;
+}
+
+int midHighCenterMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[1] + 3, 84);
+        return 0;
+}
+
+int midHighCourMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[2] + 3, 84);
+        return 0;
+}
+
+int fullJardinMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[0] + 3, 127);
+        return 0;
+}
+
+int fullCenterMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[1] + 3, 127);
+        return 0;
+}
+
+int fullCourMH(Controller *surface, int val)
+{
+    if (val == 127)
+        startLight(lyreSpots[2] + 3, 127);
+        return 0;
+}
+
+int panJardinMH(Controller *surface, int val)
+{
+    startLight(lyreSpots[0] + 4, val * 2);
+    return 0;
+}
+
+int panCenterMH(Controller *surface, int val)
+{
+    startLight(lyreSpots[1] + 4, val * 2);
+    return 0;
+}
+
+int panCourMH(Controller *surface, int val)
+{
+    startLight(lyreSpots[2] + 4, val * 2);
+    return 0;
+}
+
+int tiltJardinMH(Controller *surface, int val)
+{
+    startLight(lyreSpots[0] + 5, val * 2);
+    return 0;
+}
+
+int tiltCenterMH(Controller *surface, int val)
+{
+    startLight(lyreSpots[1] + 5, val * 2);
+    return 0;
+}
+
+int tiltCourMH(Controller *surface, int val)
+{
+    startLight(lyreSpots[2] + 5, val * 2);
+    return 0;
+}
+
+void setModeLCDs(Controller *surface, int mode)
+{
+    surface->setLCDColor({3, 4}, XTOUCH_SCREEN_WHITE);
+    surface->setLCDColor(7, XTOUCH_SCREEN_CYAN);
+    surface->setLCDColor(8, XTOUCH_SCREEN_GREEN);
+    if (mode == 0)
     {
-        if (globalSpeed > 0)
-        {
-            // //if (i % 100)
-            // transitionSoleil(getAnimSpeed());
-            surface->animTimeFunctionVector(XTOUCH_ROWS[2], &getAnimSpeed, 0);
-            transitionSoleil(getAnimSpeed());
-        }
-        else
-            usleep(10000);
-
-        if (globalSpeed != previousValue)
-        {
-            previousValue = globalSpeed;
-            surface->setLight(XTOUCH_DOWN, (globalSpeed > 2) ? 127 : 0);
-            // startLight(1, (globalSpeed > 0) ? 0 : 255);
-        }
-        i++;
+        surface->setLCDColor({1, 2, 5, 6}, XTOUCH_SCREEN_RED);
     }
-}
-
-void randomAnim(Controller *surface)
-{
-    surface->animRandomOfVector({70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90}, -1, 500, 0);
-}
-
-void redWoosh()
-{
-    int addresses[4] = {7, 11, 17, 23};
-    while (1)
+    else
     {
-        for (int i = 0; i < 4; i++)
-        {
-            startLight(addresses[i % 4], 255);
-            startLight(addresses[(i - 1) % 4], 0);
-            usleep(100000);
-        }
-        startLight(addresses[3], 0);
-        usleep(900000);
+        surface->setLCDColor({1, 2, 5, 6}, XTOUCH_SCREEN_BLUE);
     }
-}
+    surface->setLCDText({1, 2}, {0, 0}, "LYRE 1");
+    usleep(100);
+    surface->setLCDText({3, 4}, {0, 0}, "LYRE 2");
+    usleep(100);
+    surface->setLCDText({5, 6}, {0, 0}, "LYRE 3");
+    usleep(100);
+    surface->setLCDText({7, 8}, {0, 0}, "LYRES");
+    usleep(100);
+    surface->setLCDText({1, 3, 5}, {1, 1, 1}, "PAN");
+    usleep(100);
+    surface->setLCDText({2, 4, 6}, {1, 1, 1}, "TILT");
+    usleep(100);
+    surface->setLCDText(7, 1, "FOCUS");
+    usleep(100);
+    surface->setLCDText(8, 1, "COLOR");
 
-void pinkSwing()
-{
-    int addresses[4] = {7, 11, 17, 23};
-    while (1)
-    {
-        for (int i = 0; i < 256; i++)
-        {
-            startLight(addresses[1], 255 - i);
-            startLight(addresses[1] + 2, 255 - i);
-            startLight(addresses[1] + 3, 255 - i);
-            startLight(addresses[2], 255 - i);
-            startLight(addresses[2] + 2, 255 - i);
-            startLight(addresses[2] + 3, 255 - i);
-            startLight(addresses[0], i);
-            startLight(addresses[0] + 2, i);
-            startLight(addresses[0] + 3, i);
-            startLight(addresses[3], i);
-            startLight(addresses[3] + 2, i);
-            startLight(addresses[3] + 3, i);
-            usleep(10000);
-        }
-        for (int i = 0; i < 256; i++)
-        {
-            startLight(addresses[0], 255 - i);
-            startLight(addresses[0] + 2, 255 - i);
-            startLight(addresses[0] + 3, 255 - i);
-            startLight(addresses[3], 255 - i);
-            startLight(addresses[3] + 2, 255 - i);
-            startLight(addresses[3] + 3, 255 - i);
-            startLight(addresses[1], i);
-            startLight(addresses[1] + 2, i);
-            startLight(addresses[1] + 3, i);
-            startLight(addresses[2], i);
-            startLight(addresses[2] + 2, i);
-            startLight(addresses[2] + 3, i);
-            usleep(10000);
-        }
-    }
-}
+    surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_1_CH, &panJardinMH});
+    surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_2_CH, &tiltJardinMH});
+    surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_3_CH, &panCenterMH});
+    surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_4_CH, &tiltCenterMH});
+    surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_5_CH, &panCourMH});
+    surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_6_CH, &tiltCourMH});
 
-int getFaderAlertSin(int x, int &amp, int &period, int &ampOffset, int const &timeOffset)
-{
-    return amp * std::sin(2 * M_PI * (x + timeOffset * 3) / period) + ampOffset;
-}
+    surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_7_CH, &focusMH});
+    surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_8_CH, &colorMH});
 
-void redAlarm(Controller *surface)
-{
-    int timer = 0;
-    int rndOffset = 30 + std::rand() % 67;
-    int rndAmp = 10 + std::rand() % 15;
-    int rndPeriod = 5 + std::rand() % 60;
-    int period = 60;
-    int memory = 81;
-    int faders[memory] = {0};
-    int topdanger = 0;
-    int topDangerPeriod = 20;
-    int dispersion = 5;
-    while (1)
-    {
-        if (timer % period == 0)
-        {
-            surface->setLCDColor({2, 4, 6, 8}, XTOUCH_SCREEN_BLACK);
-            surface->setLCDColor({1, 3, 5, 7}, XTOUCH_SCREEN_RED);
-
-            rndPeriod = 20 + std::rand() % 100;
-            // startLight(7,255);
-        }
-        if (timer % period == period / 4)
-        {
-            surface->allLightsRed(XTOUCH_STATUS_ON);
-        }
-        if (timer % period == period / 2)
-        {
-            surface->setLCDColor({1, 3, 5, 7}, XTOUCH_SCREEN_BLACK);
-            surface->setLCDColor({2, 4, 6, 8}, XTOUCH_SCREEN_RED);
-
-            // startLight(7,0);
-        }
-        if (timer % period == 3 * period / 4)
-        {
-            surface->allLightsRed(XTOUCH_STATUS_OFF);
-        }
-        if (timer % 9 == 0)
-        {
-            surface->setLight({61, 69, 83, 90}, XTOUCH_STATUS_ON);
-            if (timer % 120 < 40)
-            {
-                surface->setLight({8, 11, 12, 15}, XTOUCH_STATUS_ON);
-            }
-        }
-        if (timer % 9 == 4)
-            surface->setLight({61, 69, 83, 90, 8, 11, 12, 15}, XTOUCH_STATUS_OFF);
-
-        if (timer % 600 == 0)
-        {
-            rndOffset = 30 + std::rand() % 34;
-            rndAmp = 10 + std::rand() % 15;
-        }
-        if (timer % 80 < 20)
-            surface->setRing({1, 4, 5, 8}, {XTOUCH_RING_MODE_DISPERSION_WEXT, XTOUCH_RING_MODE_NORMAL, XTOUCH_RING_MODE_NORMAL, XTOUCH_RING_MODE_DISPERSION_WEXT}, {dispersion, 0, 0, dispersion});
-        else if (timer % 80 < 40)
-            surface->setRing({2, 1, 8, 7}, {XTOUCH_RING_MODE_DISPERSION_WEXT, XTOUCH_RING_MODE_NORMAL, XTOUCH_RING_MODE_NORMAL, XTOUCH_RING_MODE_DISPERSION_WEXT}, {dispersion, 0, 0, dispersion});
-        else if (timer % 80 < 60)
-            surface->setRing({3, 2, 7, 6}, {XTOUCH_RING_MODE_DISPERSION_WEXT, XTOUCH_RING_MODE_NORMAL, XTOUCH_RING_MODE_NORMAL, XTOUCH_RING_MODE_DISPERSION_WEXT}, {dispersion, 0, 0, dispersion});
-        else
-            surface->setRing({4, 3, 6, 5}, {XTOUCH_RING_MODE_DISPERSION_WEXT, XTOUCH_RING_MODE_NORMAL, XTOUCH_RING_MODE_NORMAL, XTOUCH_RING_MODE_DISPERSION_WEXT}, {dispersion, 0, 0, dispersion});
-        if (timer % 20 == 0)
-        {
-            dispersion = 5;
-        }
-        if (timer % 4 == 0)
-            dispersion--;
-        for (size_t i = 0; i < 8; i++)
-        {
-            faders[i + 1] = faders[i];
-        }
-        faders[timer % memory] = getFaderAlertSin(timer, rndAmp, rndPeriod, rndOffset, 0);
-
-        if (timer % 4 == 0)
-        {
-            topdanger++;
-            if ((topdanger % topDangerPeriod) < XTOUCH_ROWS[0].size() * 2)
-            {
-                surface->setLight(XTOUCH_ROWS[0][topdanger % topDangerPeriod], XTOUCH_STATUS_ON);
-            }
-            else
-            {
-                surface->setLight(XTOUCH_ROWS[0][(topdanger - XTOUCH_ROWS[0].size() * 2) % topDangerPeriod], XTOUCH_STATUS_OFF);
-            }
-        }
-
-        surface->setFader(XTOUCH_FADERS, {faders[(timer) % memory],
-                                          faders[(timer + memory / 9) % memory],
-                                          faders[(timer + 2 * memory / 9) % memory],
-                                          faders[(timer + 3 * memory / 9) % memory],
-                                          faders[(timer + 4 * memory / 9) % memory],
-                                          faders[(timer + 5 * memory / 9) % memory],
-                                          faders[(timer + 6 * memory / 9) % memory],
-                                          faders[(timer + 7 * memory / 9) % memory],
-                                          faders[(timer + 8 * memory / 9) % memory]});
-
-        usleep(1000000 / period);
-        timer++;
-        // timer %= period;
-    }
-}
-
-void greenChaser(Controller *surface)
-{
-    while (1)
-    {
-        usleep(2000000);
-        surface->animFilledVector(XTOUCH_BTN_GREEN, 60, 0);
-        surface->setLight({0, 7}, {127, 127});
-        usleep(100000);
-        surface->setLight({0, 7}, {0, 0});
-    }
+    surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_M_CH, &halogen});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_FLIP, &switchLedLights});
 }
 
 int modesChanger(Controller *surface, int val)
@@ -405,51 +311,18 @@ int modesChanger(Controller *surface, int val)
 
     if (globalMode == 0)
     {
-        surface->addValueToUpdate({TRIGGER_FADER_TYPE, XTOUCH_FADER_1_CH, &globalSpeed});
-        surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_1_CH, &updateOtherFaders});
-        surface->setLCDFullLineText(0, "Commandes moteurs principaux");
-        surface->setLCDColor({1, 8}, XTOUCH_SCREEN_YELLOW);
-        surface->setLCDColor({3, 4, 5, 6}, XTOUCH_SCREEN_WHITE);
-        surface->setFader({XTOUCH_FADER_2_CH, XTOUCH_FADER_3_CH, XTOUCH_FADER_4_CH, XTOUCH_FADER_5_CH, XTOUCH_FADER_6_CH, XTOUCH_FADER_7_CH}, 0);
-        surface->setFader(XTOUCH_FADER_1_CH, 127);
-        surface->setFader(XTOUCH_FADER_8_CH, 69);
-
-        globalActiveThreads.emplace_back(yellowLineAnim, surface);
-        globalActiveThreads.emplace_back(randomAnim, surface);
+        surface->setSegmentsChar({8, 7, 6, 5, 4}, {'d', 'r', 'e', 'a', 'm'});
+        setModeLCDs(surface, 0);
+        switchLedLights(surface, 127);
     }
     else if (globalMode == 1)
     {
-        surface->setLCDColor({1, 8}, XTOUCH_SCREEN_GREEN);
-        surface->setLCDColor({4, 5}, XTOUCH_SCREEN_BLUE);
-        surface->setLight(XTOUCH_ZOOM, XTOUCH_STATUS_BLINK);
-        surface->setFader(XTOUCH_FADERS, {90, 74, 65, 60, 55, 60, 65, 74, 90});
-        globalActiveThreads.emplace_back(greenChaser, surface);
-        globalActiveThreads.emplace_back(soleilFluctuant);
+        surface->setSegmentsChar({9, 8, 7, 6, 5, 4, 3}, {'r', 'e', 'a', 'l', 'i', 't', 'y'});
+        setModeLCDs(surface, 1);
+        switchLedLights(surface, 127);
     }
-    else if (globalMode == 2)
-    {
-        surface->setLCDText({1, 3, 5, 7}, {0, 0, 0, 0}, "ALERT!");
-        surface->setLCDText({2, 4, 6, 8}, {0, 0, 0, 0}, "DANGER");
-        globalActiveThreads.emplace_back(redAlarm, surface);
-        globalActiveThreads.emplace_back(soleilFort);
-        globalActiveThreads.emplace_back(redWoosh);
-    }
-    else if (globalMode == 3)
-    {
-        surface->setLCDColor(XTOUCH_CHANNELS, XTOUCH_SCREEN_BLUE);
-        surface->allLightsBlue(1);
-        startLight(13, 255);
-        startLight(19, 255);
-    }
-    else if (globalMode == 4)
-    {
-        surface->setLCDColor(XTOUCH_CHANNELS, XTOUCH_SCREEN_PURPLE);
-        surface->setLCDText({1, 3, 5, 7}, {0, 0, 0, 0}, "LOVE");
-        surface->setLCDText({2, 4, 6, 8}, {1, 1, 1, 1}, "LOVE");
-        globalActiveThreads.emplace_back(pinkSwing);
-        surface->setLight({87, 77, 79, 71, 80, 54, 61, 63, 64, 67, 68, 57, 58}, 127);
-        surface->setFramesSegment(" 69");
-        surface->setAssignmentSegment("69");
+    else if (globalMode == 2) {
+        globalActiveThreads.emplace_back(dateTimeThread,surface);
     }
 
     return 0;

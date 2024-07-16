@@ -169,18 +169,18 @@ void Controller::startThreads()
 {
     std::thread inputThread(&Controller::processMidiInput, this);
     std::thread eventThread(&Controller::processMidiEvents, this);
-    std::thread dateTimeThread(&Controller::dateTimeThread, this);
+    // TIME MARK std::thread dateTimeThread(&Controller::dateTimeThread, this);
 
     inputThread.join();
     eventThread.join();
-    dateTimeThread.join();
+    // TIME MARK dateTimeThread.join();
 }
 
 // COMMANDS HANDLERS
 
 void Controller::buttonsHandler(int const &channel, int const &button, int const &value)
 {
-    setLight(button, value);
+    //AUTOLIGHT MARK: setLight(button, value);
     for (typeTriggerUpdatePointer evt : pointersToUpdateOnTrigger)
     {
         if (evt.type == TRIGGER_BUTTON_TYPE && evt.triggeredBy == button)
