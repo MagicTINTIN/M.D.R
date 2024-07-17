@@ -90,11 +90,13 @@ void startLight(std::vector<int> lights, int value)
     }
 }
 
-
 int switchLedLights(Controller *s, int val)
 {
+    if (val == 0)
+        return 0;
     switchLedLightsVar++;
-    switchLedLightsVar%=2;
+    switchLedLightsVar %= 2;
+    s->setLight(XTOUCH_FLIP, switchLedLightsVar == 1 ? 127 : 0);
     for (int i = 0; i < 4; i++)
     {
         // printf("meh\n");
@@ -105,8 +107,8 @@ int switchLedLights(Controller *s, int val)
 
 int halogen(Controller *surface, int val)
 {
-    startLight(1, val);
-    startLight(2, val);
+    startLight(1, val * 2);
+    startLight(2, val * 2);
     return 0;
 }
 
@@ -128,103 +130,130 @@ int colorMH(Controller *surface, int val)
 
 int offJardinMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[0] + 3, 0);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[0] + 3, 0);
+    surface->setLight({XTOUCH_SELECT1, XTOUCH_SELECT2, XTOUCH_MUTE1, XTOUCH_MUTE2, XTOUCH_SOLO1, XTOUCH_SOLO2, XTOUCH_REC1, XTOUCH_REC2}, {127, 127, 0, 0, 0, 0, 0, 0});
+    return 0;
 }
 
 int offCenterMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[1] + 3, 0);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[1] + 3, 0);
+    surface->setLight({XTOUCH_SELECT3, XTOUCH_SELECT4, XTOUCH_MUTE3, XTOUCH_MUTE4, XTOUCH_SOLO3, XTOUCH_SOLO4, XTOUCH_REC3, XTOUCH_REC4}, {127, 127, 0, 0, 0, 0, 0, 0});
+    return 0;
 }
 
 int offCourMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[2] + 3, 0);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[2] + 3, 0);
+    surface->setLight({XTOUCH_SELECT5, XTOUCH_SELECT6, XTOUCH_MUTE5, XTOUCH_MUTE6, XTOUCH_SOLO5, XTOUCH_SOLO6, XTOUCH_REC5, XTOUCH_REC6}, {127, 127, 0, 0, 0, 0, 0, 0});
+    return 0;
 }
 
 int midLowJardinMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[0] + 3, 42);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[0] + 3, 32);
+    surface->setLight({XTOUCH_SELECT1, XTOUCH_SELECT2, XTOUCH_MUTE1, XTOUCH_MUTE2, XTOUCH_SOLO1, XTOUCH_SOLO2, XTOUCH_REC1, XTOUCH_REC2}, {127, 127, 127, 127, 0, 0, 0, 0});
+    return 0;
 }
 
 int midLowCenterMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[1] + 3, 42);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[1] + 3, 32);
+    surface->setLight({XTOUCH_SELECT3, XTOUCH_SELECT4, XTOUCH_MUTE3, XTOUCH_MUTE4, XTOUCH_SOLO3, XTOUCH_SOLO4, XTOUCH_REC3, XTOUCH_REC4}, {127, 127, 127, 127, 0, 0, 0, 0});
+    return 0;
 }
 
 int midLowCourMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[2] + 3, 42);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[2] + 3, 32);
+    surface->setLight({XTOUCH_SELECT5, XTOUCH_SELECT6, XTOUCH_MUTE5, XTOUCH_MUTE6, XTOUCH_SOLO5, XTOUCH_SOLO6, XTOUCH_REC5, XTOUCH_REC6}, {127, 127, 127, 127, 0, 0, 0, 0});
+    return 0;
 }
 
 int midHighJardinMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[0] + 3, 84);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[0] + 3, 48);
+    surface->setLight({XTOUCH_SELECT1, XTOUCH_SELECT2, XTOUCH_MUTE1, XTOUCH_MUTE2, XTOUCH_SOLO1, XTOUCH_SOLO2, XTOUCH_REC1, XTOUCH_REC2}, {127, 127, 127, 127, 127, 127, 0, 0});
+    return 0;
 }
 
 int midHighCenterMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[1] + 3, 84);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[1] + 3, 48);
+    surface->setLight({XTOUCH_SELECT3, XTOUCH_SELECT4, XTOUCH_MUTE3, XTOUCH_MUTE4, XTOUCH_SOLO3, XTOUCH_SOLO4, XTOUCH_REC3, XTOUCH_REC4}, {127, 127, 127, 127, 127, 127, 0, 0});
+    return 0;
 }
 
 int midHighCourMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[2] + 3, 84);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[2] + 3, 48);
+    surface->setLight({XTOUCH_SELECT5, XTOUCH_SELECT6, XTOUCH_MUTE5, XTOUCH_MUTE6, XTOUCH_SOLO5, XTOUCH_SOLO6, XTOUCH_REC5, XTOUCH_REC6}, {127, 127, 127, 127, 127, 127, 0, 0});
+    return 0;
 }
 
 int fullJardinMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[0] + 3, 127);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[0] + 3, 127);
+    surface->setLight({XTOUCH_SELECT1, XTOUCH_SELECT2, XTOUCH_MUTE1, XTOUCH_MUTE2, XTOUCH_SOLO1, XTOUCH_SOLO2, XTOUCH_REC1, XTOUCH_REC2}, {127, 127, 127, 127, 127, 127, 127, 127});
+    return 0;
 }
 
 int fullCenterMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[1] + 3, 127);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[1] + 3, 127);
+    surface->setLight({XTOUCH_SELECT3, XTOUCH_SELECT4, XTOUCH_MUTE3, XTOUCH_MUTE4, XTOUCH_SOLO3, XTOUCH_SOLO4, XTOUCH_REC3, XTOUCH_REC4}, {127, 127, 127, 127, 127, 127, 127, 127});
+    return 0;
 }
 
 int fullCourMH(Controller *surface, int val)
 {
-    if (val == 127)
-        startLight(lyreSpots[2] + 3, 127);
+    if (val == 0)
         return 0;
+    startLight(lyreSpots[2] + 3, 127);
+    surface->setLight({XTOUCH_SELECT5, XTOUCH_SELECT6, XTOUCH_MUTE5, XTOUCH_MUTE6, XTOUCH_SOLO5, XTOUCH_SOLO6, XTOUCH_REC5, XTOUCH_REC6}, {127, 127, 127, 127, 127, 127, 127, 127});
+    return 0;
 }
 
 int panJardinMH(Controller *surface, int val)
 {
-    startLight(lyreSpots[0] + 4, val * 2);
+    // startLight(lyreSpots[0] + 4, val * 2);
+    startLight(lyreSpots[0] + 4, mapRange(val, 0, 127, 42, 127));
     return 0;
 }
 
 int panCenterMH(Controller *surface, int val)
 {
-    startLight(lyreSpots[1] + 4, val * 2);
+    // startLight(lyreSpots[1] + 4, val * 2);
+    startLight(lyreSpots[1] + 4, mapRange(val, 0, 127, 42, 127));
     return 0;
 }
 
 int panCourMH(Controller *surface, int val)
 {
-    startLight(lyreSpots[2] + 4, val * 2);
+    // startLight(lyreSpots[2] + 4, val * 2);
+    startLight(lyreSpots[2] + 4, mapRange(val, 0, 127, 42, 127));
     return 0;
 }
 
@@ -274,6 +303,46 @@ void setModeLCDs(Controller *surface, int mode)
     surface->setLCDText(7, 1, "FOCUS");
     usleep(100);
     surface->setLCDText(8, 1, "COLOR");
+    usleep(100);
+
+    surface->setLight({XTOUCH_SELECT1, XTOUCH_SELECT2, XTOUCH_MUTE1, XTOUCH_MUTE2, XTOUCH_SOLO1, XTOUCH_SOLO2, XTOUCH_REC1, XTOUCH_REC2}, {127, 127, 0, 0, 0, 0, 0, 0});
+    usleep(100);
+    surface->setLight({XTOUCH_SELECT3, XTOUCH_SELECT4, XTOUCH_MUTE3, XTOUCH_MUTE4, XTOUCH_SOLO3, XTOUCH_SOLO4, XTOUCH_REC3, XTOUCH_REC4}, {127, 127, 0, 0, 0, 0, 0, 0});
+    usleep(100);
+    surface->setLight({XTOUCH_SELECT5, XTOUCH_SELECT6, XTOUCH_MUTE5, XTOUCH_MUTE6, XTOUCH_SOLO5, XTOUCH_SOLO6, XTOUCH_REC5, XTOUCH_REC6}, {127, 127, 0, 0, 0, 0, 0, 0});
+    usleep(100);
+    surface->setFader({XTOUCH_FADER_1_CH,XTOUCH_FADER_3_CH,XTOUCH_FADER_5_CH},64);
+    panJardinMH(surface, 64);
+    panCenterMH(surface, 64);
+    panCourMH(surface, 64);
+
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SELECT1, &offJardinMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SELECT2, &offJardinMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SELECT3, &offCenterMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SELECT4, &offCenterMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SELECT5, &offCourMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SELECT6, &offCourMH});
+
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_MUTE1, &midLowJardinMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_MUTE2, &midLowJardinMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_MUTE3, &midLowCenterMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_MUTE4, &midLowCenterMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_MUTE5, &midLowCourMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_MUTE6, &midLowCourMH});
+
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SOLO1, &midHighJardinMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SOLO2, &midHighJardinMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SOLO3, &midHighCenterMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SOLO4, &midHighCenterMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SOLO5, &midHighCourMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SOLO6, &midHighCourMH});
+
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_REC1, &fullJardinMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_REC2, &fullJardinMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_REC3, &fullCenterMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_REC4, &fullCenterMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_REC5, &fullCourMH});
+    surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_REC6, &fullCourMH});
 
     surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_1_CH, &panJardinMH});
     surface->addFunctionToTrigger({TRIGGER_FADER_TYPE, XTOUCH_FADER_2_CH, &tiltJardinMH});
@@ -308,6 +377,7 @@ int modesChanger(Controller *surface, int val)
     std::cout << "=> MODE : " << globalMode << std::endl;
     surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_SCRUB, &modesChanger});
     surface->addFunctionToTrigger({TRIGGER_BUTTON_TYPE, XTOUCH_INST, &switchLights});
+    switchLedLightsVar = 0;
 
     if (globalMode == 0)
     {
@@ -321,8 +391,9 @@ int modesChanger(Controller *surface, int val)
         setModeLCDs(surface, 1);
         switchLedLights(surface, 127);
     }
-    else if (globalMode == 2) {
-        globalActiveThreads.emplace_back(dateTimeThread,surface);
+    else if (globalMode == 2)
+    {
+        globalActiveThreads.emplace_back(dateTimeThread, surface);
     }
 
     return 0;
@@ -365,6 +436,7 @@ int main()
     // surface.setLCDText(7, 1, "Coucou");
     // surface.setLCDText(8, 0, "Yo!", 1);
 
+    globalActiveThreads.emplace_back(dateTimeThread, &surface);
     surface.startThreads();
 
     terminatePortMidi();
