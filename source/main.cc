@@ -239,21 +239,21 @@ int fullCourMH(Controller *surface, int val)
 int panJardinMH(Controller *surface, int val)
 {
     // startLight(lyreSpots[0] + 4, val * 2);
-    startLight(lyreSpots[0] + 4, mapRange(val, 0, 127, 42, 127));
+    startLight(lyreSpots[0] + 4, mapRange(val, 0, 127, 63, 106));
     return 0;
 }
 
 int panCenterMH(Controller *surface, int val)
 {
     // startLight(lyreSpots[1] + 4, val * 2);
-    startLight(lyreSpots[1] + 4, mapRange(val, 0, 127, 42, 127));
+    startLight(lyreSpots[1] + 4, mapRange(val, 0, 127, 63, 106));
     return 0;
 }
 
 int panCourMH(Controller *surface, int val)
 {
     // startLight(lyreSpots[2] + 4, val * 2);
-    startLight(lyreSpots[2] + 4, mapRange(val, 0, 127, 42, 127));
+    startLight(lyreSpots[2] + 4, mapRange(val, 0, 127, 63, 106));
     return 0;
 }
 
